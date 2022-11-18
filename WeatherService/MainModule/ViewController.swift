@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 protocol MainViewProtocol: AnyObject {
     
@@ -17,10 +18,8 @@ class MainViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+
     }
-
-
 }
 
 extension MainViewController: MainViewProtocol {
