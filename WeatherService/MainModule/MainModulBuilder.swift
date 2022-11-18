@@ -16,7 +16,7 @@ class MainModulBuider {
         viewController.presenter = presenter
         presenter.view = viewController
         interctor.presenter = presenter
-        router.presenter = presenter
+        router.view = viewController
         return viewController
     }
 }

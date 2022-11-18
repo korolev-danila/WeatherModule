@@ -16,6 +16,11 @@
 		83CFBC3E2926A199001FF864 /* MainRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CFBC3D2926A199001FF864 /* MainRouter.swift */; };
 		83CFBC402926A1E2001FF864 /* MainInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CFBC3F2926A1E2001FF864 /* MainInteractor.swift */; };
 		83CFBC422926A36A001FF864 /* MainModulBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CFBC412926A36A001FF864 /* MainModulBuilder.swift */; };
+		83CFBC452927E3F1001FF864 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CFBC442927E3F1001FF864 /* SearchView.swift */; };
+		83CFBC472927E492001FF864 /* SearchPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CFBC462927E492001FF864 /* SearchPresenter.swift */; };
+		83CFBC492927E4C6001FF864 /* SearchRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CFBC482927E4C6001FF864 /* SearchRouter.swift */; };
+		83CFBC4B2927E4EF001FF864 /* SearchInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CFBC4A2927E4EF001FF864 /* SearchInteractor.swift */; };
+		83CFBC4D2927E531001FF864 /* SearchModulBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CFBC4C2927E531001FF864 /* SearchModulBuilder.swift */; };
 		DB27CF564AF0111B2DAA4BD9 /* Pods_WeatherService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C55471B2D92C35A18920D57 /* Pods_WeatherService.framework */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +38,11 @@
 		83CFBC3D2926A199001FF864 /* MainRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainRouter.swift; sourceTree = "<group>"; };
 		83CFBC3F2926A1E2001FF864 /* MainInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainInteractor.swift; sourceTree = "<group>"; };
 		83CFBC412926A36A001FF864 /* MainModulBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainModulBuilder.swift; sourceTree = "<group>"; };
+		83CFBC442927E3F1001FF864 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		83CFBC462927E492001FF864 /* SearchPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPresenter.swift; sourceTree = "<group>"; };
+		83CFBC482927E4C6001FF864 /* SearchRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchRouter.swift; sourceTree = "<group>"; };
+		83CFBC4A2927E4EF001FF864 /* SearchInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchInteractor.swift; sourceTree = "<group>"; };
+		83CFBC4C2927E531001FF864 /* SearchModulBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModulBuilder.swift; sourceTree = "<group>"; };
 		8D3FD6E3CBBC9EC6C6105530 /* Pods-WeatherService.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeatherService.release.xcconfig"; path = "Target Support Files/Pods-WeatherService/Pods-WeatherService.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -54,7 +64,6 @@
 				325967A568133765D6890865 /* Pods-WeatherService.debug.xcconfig */,
 				8D3FD6E3CBBC9EC6C6105530 /* Pods-WeatherService.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -89,6 +98,7 @@
 			children = (
 				83CFBC3829269F91001FF864 /* Application */,
 				83CFBC3A29269FBD001FF864 /* MainModule */,
+				83CFBC432927E3BF001FF864 /* SearchCity */,
 				83CFBC3929269FA8001FF864 /* Resources */,
 			);
 			path = WeatherService;
@@ -123,6 +133,18 @@
 				83CFBC412926A36A001FF864 /* MainModulBuilder.swift */,
 			);
 			path = MainModule;
+			sourceTree = "<group>";
+		};
+		83CFBC432927E3BF001FF864 /* SearchCity */ = {
+			isa = PBXGroup;
+			children = (
+				83CFBC442927E3F1001FF864 /* SearchView.swift */,
+				83CFBC462927E492001FF864 /* SearchPresenter.swift */,
+				83CFBC482927E4C6001FF864 /* SearchRouter.swift */,
+				83CFBC4A2927E4EF001FF864 /* SearchInteractor.swift */,
+				83CFBC4C2927E531001FF864 /* SearchModulBuilder.swift */,
+			);
+			path = SearchCity;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -241,8 +263,13 @@
 			files = (
 				83CFBC422926A36A001FF864 /* MainModulBuilder.swift in Sources */,
 				83CFBC3E2926A199001FF864 /* MainRouter.swift in Sources */,
+				83CFBC472927E492001FF864 /* SearchPresenter.swift in Sources */,
 				83CFBC2929269869001FF864 /* ViewController.swift in Sources */,
 				83CFBC2529269869001FF864 /* AppDelegate.swift in Sources */,
+				83CFBC4D2927E531001FF864 /* SearchModulBuilder.swift in Sources */,
+				83CFBC452927E3F1001FF864 /* SearchView.swift in Sources */,
+				83CFBC492927E4C6001FF864 /* SearchRouter.swift in Sources */,
+				83CFBC4B2927E4EF001FF864 /* SearchInteractor.swift in Sources */,
 				83CFBC2729269869001FF864 /* SceneDelegate.swift in Sources */,
 				83CFBC3C2926A040001FF864 /* MainPresenter.swift in Sources */,
 				83CFBC402926A1E2001FF864 /* MainInteractor.swift in Sources */,

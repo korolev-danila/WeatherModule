@@ -8,7 +8,7 @@
 import Foundation
 
 protocol MainPresenterProtocol: AnyObject {
-    
+    func didTapButton()
 }
 
 class MainPresenter {
@@ -20,6 +20,10 @@ class MainPresenter {
     init(interactor: MainInteractorProtocol, router: MainRouterProtocol){
         self.interactor = interactor
         self.router = router
+    }
+    
+    func didTapButton() {
+        router.pushSearchView()
     }
 }
 

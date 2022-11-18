@@ -8,9 +8,14 @@
 import Foundation
 
 protocol MainRouterProtocol: AnyObject {
-    
+    func pushSearchView()
 }
 
 class MainRouter: MainRouterProtocol {
-    weak var presenter: MainPresenterProtocol? 
+    weak var view: MainViewController?
+    
+    func pushSearchView() {
+        let vc = SearchModulBuider.build()
+        view?.showDetailViewController(vc, sender: nil)
+    }
 }
