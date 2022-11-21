@@ -60,6 +60,7 @@ public class SearchViewController: UIViewController {
         tv.delegate = self
         tv.dataSource = self
         tv.register(SearchCell.self, forCellReuseIdentifier: "cell")
+        tv.keyboardDismissMode = .onDrag
         
         return tv
     }()
@@ -87,11 +88,17 @@ extension SearchViewController: SearchViewProtocol {
         
         view.backgroundColor = .white
         
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tap)
+        
         view.addSubview(textField)
         view.addSubview(tableView)
         view.addSubview(activityView)
         
-        activityView.center = self.view.center
+        activityView.snp.makeConstraints { make in
+            make.centerX.equalTo(self.view.snp.centerX)
+            make.centerY.equalTo(self.view.snp.centerY).offset(-75)
+        }
         
         textField.snp.makeConstraints { make in
             make.top.equalTo(8)
@@ -106,6 +113,10 @@ extension SearchViewController: SearchViewProtocol {
             make.leading.equalTo(view.snp_leadingMargin)
             make.trailing.equalTo(view.snp_trailingMargin)
         }
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
     
     // MARK: - ActivityIndicator method
@@ -141,7 +152,12 @@ extension SearchViewController: UITextFieldDelegate {
         return true
     }
     
-    
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+
+        textField.resignFirstResponder()
+        return true
+    }
+        
     public func textFieldShouldClear(_ textField: UITextField) -> Bool {
         
         hideActivityIndicator()

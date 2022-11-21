@@ -21,7 +21,7 @@ class SearchCell: UITableViewCell, SearchCellProtocol {
         label.text = "Name label"
         label.font = UIFont.systemFont(ofSize: 20)
         label.adjustsFontSizeToFitWidth = true
-        label.numberOfLines = 1
+        label.numberOfLines = 2
         label.minimumScaleFactor = 0.2
         label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .left
@@ -36,7 +36,7 @@ class SearchCell: UITableViewCell, SearchCellProtocol {
         label.font = UIFont.systemFont(ofSize: 20)
         label.adjustsFontSizeToFitWidth = true
         label.numberOfLines = 3
-        label.minimumScaleFactor = 0.2
+        label.minimumScaleFactor = 0.02
         label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .right
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -61,12 +61,16 @@ class SearchCell: UITableViewCell, SearchCellProtocol {
         self.addSubview(countryLabel)
 
         nameLabel.snp.makeConstraints { make in
-            make.leading.equalTo(10)
-            make.bottom.equalTo(-5)
+            make.leading.equalTo(12)
+            make.trailing.equalTo(self.snp.centerX)
+            make.top.equalTo(2)
+            make.bottom.equalTo(-2)
         }
         countryLabel.snp.makeConstraints { make in
+            make.leading.equalTo(self.snp.centerX)
             make.trailing.equalTo(-10)
-            make.bottom.equalTo(-5)
+            make.top.equalTo(2)
+            make.bottom.equalTo(-2)
         }
     }
     
