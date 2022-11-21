@@ -5,8 +5,6 @@
 //  Created by Данила on 17.11.2022.
 //
 
-import UIKit
-
 public class MainModulBuider {
     public static func build() -> MainViewController {
         let interctor = MainInteractor()
@@ -17,6 +15,7 @@ public class MainModulBuider {
         presenter.view = viewController
         interctor.presenter = presenter
         router.view = viewController
+        
         return viewController
     }
 }

@@ -12,8 +12,7 @@ class SearchModulBuider {
         let interctor = SearchInteractor()
         let router = SearchRouter()
         let presenter = SearchPresenter(interactor: interctor, router: router)
-        let viewController = SearchViewController()
-        viewController.presenter = presenter
+        let viewController = SearchViewController(presenter: presenter)
         presenter.view = viewController
         interctor.presenter = presenter
         router.presenter = presenter
