@@ -74,7 +74,7 @@ class SearchCell: UITableViewCell, SearchCellProtocol {
         }
     }
     
-    func configureCell(city: City) {
+    func configureCell(city: CitySearch) {
         nameLabel.text = city.name
         countryLabel.text = city.country
     }

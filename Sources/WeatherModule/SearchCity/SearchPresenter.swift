@@ -9,7 +9,7 @@ import Foundation
 
 protocol SearchPresenterProtocol: AnyObject {
     
-    var citys: [City] { get set }
+    var citys: [CitySearch] { get set }
     
     func fetchCitys(_ string: String)
 }
@@ -20,7 +20,7 @@ class SearchPresenter {
     var router: SearchRouterProtocol
     var interactor: SearchInteractorProtocol
     
-    var citys = [City]()
+    var citys = [CitySearch]()
     
     init(interactor: SearchInteractorProtocol, router: SearchRouterProtocol){
         self.interactor = interactor

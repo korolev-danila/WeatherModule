@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct City: Codable {
+struct CitySearch: Codable {
     let name: String
     let latitude: Double
     let longitude: Double

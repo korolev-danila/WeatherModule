@@ -13,7 +13,7 @@ protocol SearchInteractorProtocol: AnyObject {
     
     var presenter: SearchPresenterProtocol? { get set }
     
-    func fetchCitysArray(string: String, completion: @escaping (_ citys: [City]) -> ())
+    func fetchCitysArray(string: String, completion: @escaping (_ citys: [CitySearch]) -> ())
 }
 
 class SearchInteractor: SearchInteractorProtocol {
@@ -21,9 +21,9 @@ class SearchInteractor: SearchInteractorProtocol {
     
     weak var presenter: SearchPresenterProtocol?
     
-    func fetchCitysArray(string: String, completion: @escaping (_ citys: [City])  -> ()) {
+    func fetchCitysArray(string: String, completion: @escaping (_ citys: [CitySearch])  -> ()) {
         
-        var citys = [City]()
+        var citys = [CitySearch]()
         
         let url = "https://api.api-ninjas.com/v1/city?"
         
@@ -45,7 +45,7 @@ class SearchInteractor: SearchInteractorProtocol {
                     for dictionary in jsonArray {
                         do {
                             let jsonData = try JSONSerialization.data(withJSONObject: dictionary)
-                            var city = try JSONDecoder().decode(City.self, from: jsonData)
+                            var city = try JSONDecoder().decode(CitySearch.self, from: jsonData)
                             
                             for iso in Iso3166_1a2.all {
                                 if iso.rawValue == city.country {

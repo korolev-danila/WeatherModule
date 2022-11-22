@@ -10,8 +10,7 @@ public class MainModulBuider {
         let interctor = MainInteractor()
         let router = MainRouter()
         let presenter = MainPresenter(interactor: interctor, router: router)
-        let viewController = MainViewController()
-        viewController.presenter = presenter
+        let viewController = MainViewController(presenter: presenter)
         presenter.view = viewController
         interctor.presenter = presenter
         router.view = viewController
