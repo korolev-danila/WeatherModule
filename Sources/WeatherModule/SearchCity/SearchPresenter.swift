@@ -11,24 +11,30 @@ protocol SearchPresenterProtocol: AnyObject {
     
     var citys: [CitySearch] { get set }
     
+    func save(_ index: IndexPath)
     func fetchCitys(_ string: String)
 }
 
 class SearchPresenter {
     
     weak var view: SearchViewProtocol?
-    var router: SearchRouterProtocol
     var interactor: SearchInteractorProtocol
+    
+    weak var delegate: MainPresenterDelegate?
     
     var citys = [CitySearch]()
     
-    init(interactor: SearchInteractorProtocol, router: SearchRouterProtocol){
+    init(interactor: SearchInteractorProtocol, delegate: MainPresenterDelegate){
         self.interactor = interactor
-        self.router = router
+        self.delegate = delegate
     }
 }
 
 extension SearchPresenter: SearchPresenterProtocol {
+    
+    func save(_ index: IndexPath) {
+        delegate?.save(citys[index.row])
+    }
     
     func fetchCitys(_ string: String) {
         view?.showActivityIndicator()

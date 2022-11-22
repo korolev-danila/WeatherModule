@@ -14,6 +14,7 @@ public class MainModulBuider {
         presenter.view = viewController
         interctor.presenter = presenter
         router.view = viewController
+        router.delegate = presenter
         
         return viewController
     }

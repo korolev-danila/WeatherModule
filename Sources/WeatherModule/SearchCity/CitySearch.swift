@@ -12,7 +12,7 @@ struct CitySearch: Codable {
     let latitude: Double
     let longitude: Double
     var country: String
-    let population: Int
+    let population: Int?
     let isCapital: Bool
 
     enum CodingKeys: String, CodingKey {

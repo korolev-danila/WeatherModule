@@ -8,14 +8,13 @@
 import Foundation
 
 class SearchModulBuider {
-    static func build() -> SearchViewController {
+    static func build(delegate: MainPresenterDelegate) -> SearchViewController {
         let interctor = SearchInteractor()
-        let router = SearchRouter()
-        let presenter = SearchPresenter(interactor: interctor, router: router)
+        let presenter = SearchPresenter(interactor: interctor, delegate: delegate)
         let viewController = SearchViewController(presenter: presenter)
         presenter.view = viewController
         interctor.presenter = presenter
-        router.presenter = presenter
+
         return viewController
     }
 }

@@ -61,6 +61,7 @@ public class SearchViewController: UIViewController {
         tv.dataSource = self
         tv.register(SearchCell.self, forCellReuseIdentifier: "cell")
         tv.keyboardDismissMode = .onDrag
+       // tv.sele
         
         return tv
     }()
@@ -88,9 +89,6 @@ extension SearchViewController: SearchViewProtocol {
         
         view.backgroundColor = .white
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        view.addGestureRecognizer(tap)
-        
         view.addSubview(textField)
         view.addSubview(tableView)
         view.addSubview(activityView)
@@ -113,10 +111,6 @@ extension SearchViewController: SearchViewProtocol {
             make.leading.equalTo(view.snp_leadingMargin)
             make.trailing.equalTo(view.snp_trailingMargin)
         }
-    }
-    
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
     }
     
     // MARK: - ActivityIndicator method
@@ -178,7 +172,8 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("Num: \(indexPath.row)")
+        presenter.save(indexPath)
+        self.dismiss(animated: true, completion: nil)
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

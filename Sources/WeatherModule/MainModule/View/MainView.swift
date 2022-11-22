@@ -48,7 +48,7 @@ public class MainViewController: UIViewController {
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.delegate = self
         tv.dataSource = self
-        tv.register(SearchCell.self, forCellReuseIdentifier: "cell")
+        tv.register(MainCell.self, forCellReuseIdentifier: "cell")
         tv.keyboardDismissMode = .onDrag
         
         return tv
@@ -122,10 +122,10 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath) as! SearchCell
-        let city = presenter.citys[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath) as! MainCell
+        let country = presenter.countrys[indexPath.row]
         
-        cell.configureCell(city: city)
+        cell.configureCell(city: country)
         
         return cell
     }

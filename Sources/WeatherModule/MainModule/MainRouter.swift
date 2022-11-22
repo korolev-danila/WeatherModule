@@ -13,9 +13,14 @@ protocol MainRouterProtocol: AnyObject {
 
 class MainRouter: MainRouterProtocol {
     weak var view: MainViewController?
+    weak var delegate: MainPresenterDelegate?
     
     func pushSearchView() {
-        let vc = SearchModulBuider.build()
-        view?.showDetailViewController(vc, sender: nil)
+        if delegate != nil {
+            let vc = SearchModulBuider.build(delegate: delegate!)
+            view?.showDetailViewController(vc, sender: nil)
+        } else {
+            print("MainPresenterDelegate == nil")
+        }
     }
 }

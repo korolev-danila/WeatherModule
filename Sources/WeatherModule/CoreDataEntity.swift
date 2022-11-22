@@ -13,23 +13,23 @@ public final class Country: NSManagedObject {
     @NSManaged public var citys: NSSet?
 }
 
-extension Country {
+extension Country: Identifiable {
     
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Country> {
         return NSFetchRequest<Country>(entityName: "Country")
     }
     
-    @objc(addHistoryObject:)
-    @NSManaged public func addToHistory(_ value: City)
+    @objc(addCitysObject:)
+    @NSManaged public func addToCitys(_ value: City)
 
-    @objc(removeHistoryObject:)
-    @NSManaged public func removeFromHistory(_ value: City)
+    @objc(removeCitysObject:)
+    @NSManaged public func removeFromCitys(_ value: City)
 
-    @objc(addHistory:)
-    @NSManaged public func addToHistory(_ values: NSSet)
+    @objc(addCitys:)
+    @NSManaged public func addToCitys(_ values: NSSet)
 
-    @objc(removeHistory:)
-    @NSManaged public func removeFromHistory(_ values: NSSet)
+    @objc(removeCitys:)
+    @NSManaged public func removeFromCitys(_ values: NSSet)
 }
 
 public final class City: NSManagedObject {
@@ -37,10 +37,10 @@ public final class City: NSManagedObject {
     @NSManaged var isCapital: Bool
     @NSManaged var latitude: Double
     @NSManaged var longitude: Double
-    @NSManaged var country: Country?
+    @NSManaged var country: Country
 }
 
-extension City {
+extension City: Identifiable {
     @nonobjc public class func fetchRequest() -> NSFetchRequest<City> {
         return NSFetchRequest<City>(entityName: "City")
     }
@@ -122,11 +122,12 @@ func managedObjectModel() -> NSManagedObjectModel {
     
     
     // Set properties
-    countryEnt.properties = [countryNameAttr]
+    countryEnt.properties = [countryNameAttr, countryToCity]
     cityEnt.properties = [nameAttr,
                           isCapitalAttr,
                           latitudeAttr,
-                          longitudeAttr]
+                          longitudeAttr,
+                          cityToCountry]
     
     model.entities = [countryEnt,cityEnt]
     
