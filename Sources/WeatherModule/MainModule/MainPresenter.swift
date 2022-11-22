@@ -117,14 +117,7 @@ extension MainPresenter: MainPresenterDelegate {
               
               let city = City(entity: cityEntity , insertInto: context)
               city.name = citySearch.name
-              print(country)
-              print("11$$$$$$$$$$$$$$$$")
               city.country = country
-              print("22$$$$$$$$$$$$$$$$")
-              print(city.country.name)
-              print("33$$$$$$$$$$$$$$$$")
-              print(citySearch.isCapital)
-              print(city.isCapital)
               city.isCapital = citySearch.isCapital
               city.latitude = citySearch.latitude
               city.longitude = citySearch.longitude

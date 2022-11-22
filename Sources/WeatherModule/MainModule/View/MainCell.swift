@@ -69,8 +69,7 @@ class MainCell: UITableViewCell {
         }
     }
     
-    func configureCell(city: Country) {
+    func configureCell(city: City) {
         nameLabel.text = city.name
-        
     }
 }

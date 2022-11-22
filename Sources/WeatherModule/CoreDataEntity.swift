@@ -11,6 +11,17 @@ import CoreData
 public final class Country: NSManagedObject {
     @NSManaged var name: String
     @NSManaged public var citys: NSSet?
+    
+    public var citysArray: [City] {
+        let set = citys as? Set<City> ?? []
+        
+        
+        return set.sorted {
+            $0.name < $1.name
+        }.sorted {
+            $0.isCapital && !$1.isCapital
+        }
+    }
 }
 
 extension Country: Identifiable {

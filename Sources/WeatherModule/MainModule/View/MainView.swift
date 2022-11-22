@@ -71,27 +71,30 @@ public class MainViewController: UIViewController {
     
     private func initialize() {
         
+        view.backgroundColor = .white
+        
         view.addSubview(titleLabel)
         view.addSubview(tableView)
         view.addSubview(searchButton)
         
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(10)
-            make.centerY.equalTo(view.snp.centerY)
+            make.top.equalToSuperview().offset(30)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(40)
         }
-        
+
         searchButton.snp.makeConstraints { make in
             make.bottom.equalToSuperview().inset(80.0)
             make.trailing.equalToSuperview().inset(55.0)
             make.height.equalTo(50.0)
             make.width.equalTo(50.0)
         }
-        
+
         tableView.snp.makeConstraints { make in
-            make.top.equalTo(50)
-            make.bottom.equalTo(view.snp_bottomMargin)
-            make.leading.equalTo(view.snp_leadingMargin)
-            make.trailing.equalTo(view.snp_trailingMargin)
+            make.top.equalTo(titleLabel.snp.bottom).offset(5)
+            make.bottom.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
         }
     }
     
@@ -106,7 +109,7 @@ extension MainViewController: MainViewProtocol {
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     public func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return presenter.countrys.count
     }
     
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -118,15 +121,19 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return presenter.citys.count
+        return presenter.countrys[section].citysArray.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath) as! MainCell
-        let country = presenter.countrys[indexPath.row]
+        let city = presenter.countrys[indexPath.section].citysArray[indexPath.row]
         
-        cell.configureCell(city: country)
+        cell.configureCell(city: city)
         
         return cell
+    }
+    
+    public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return presenter.countrys[section].name
     }
 }
