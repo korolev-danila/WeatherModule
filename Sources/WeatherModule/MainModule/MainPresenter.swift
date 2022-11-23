@@ -89,51 +89,55 @@ extension MainPresenter: MainPresenterProtocol {
 extension MainPresenter: MainPresenterDelegate {
     
     func save(_ citySearch: CitySearch) {
-          
-          if countrys.filter({ $0.name == citySearch.country }).first != nil {
-              do {
-//
-//                  guard let entity = NSEntityDescription.entity(forEntityName: "Transaction", in: context) else { return }
-//                  let trans = Transaction(entity: entity , insertInto: context)
-//                  trans.date = Date()
-//                  trans.amount = value
-//                  trans.addBool = true
-//                  coinsCD.filter{ $0.symbol == coin.symbol }.first?.addToHistory(trans)
-//
-                  try context.save()
-                  print("save old city")
-              } catch let error as NSError {
-                  print(error.localizedDescription)
-              }
-              
-          } else {
-              
-              guard let entity = NSEntityDescription.entity(forEntityName: "Country", in: context) else { return }
-              
-              let country = Country(entity: entity , insertInto: context)
-              country.name = citySearch.country
-
-              guard let cityEntity = NSEntityDescription.entity(forEntityName: "City", in: context) else { return }
-              
-              let city = City(entity: cityEntity , insertInto: context)
-              city.name = citySearch.name
-              city.country = country
-              city.isCapital = citySearch.isCapital
-              city.latitude = citySearch.latitude
-              city.longitude = citySearch.longitude
-              
-              country.addToCitys(city)
-              
-              do {
-                  try context.save()
-                  countrys.append(country)
-                  view?.tableView.reloadData()
-                  print("Let's GOOOOOOOO")
-  // Fetch something
-                  
-              } catch let error as NSError {
-                  print(error.localizedDescription)
-              }
-          }
-      }
+        
+        func createCity(_ citySearch: CitySearch,_ country: Country) -> City? {
+            guard let cityEntity = NSEntityDescription.entity(forEntityName: "City", in: context) else { return nil}
+            
+            let city = City(entity: cityEntity , insertInto: context)
+            city.name = citySearch.name
+            city.country = country
+            city.isCapital = citySearch.isCapital
+            city.latitude = citySearch.latitude
+            city.longitude = citySearch.longitude
+            
+            return city
+        }
+        
+        if let country = countrys.filter({ $0.name == citySearch.country }).first {
+            do {
+                if country.citysArray.filter({ $0.name == citySearch.name }).first == nil {
+                    
+                    if let city = createCity(citySearch, country) {
+                        country.addToCitys(city)
+                        try context.save()
+                        view?.tableView.reloadData()
+                    }
+                } else {
+                    print("try save old city")
+                }
+            } catch let error as NSError {
+                print(error.localizedDescription)
+            }
+            
+        } else {
+            
+            do {
+                guard let entity = NSEntityDescription.entity(forEntityName: "Country", in: context) else { return }
+                
+                let country = Country(entity: entity , insertInto: context)
+                country.name = citySearch.country
+                
+                if let city = createCity(citySearch, country) {
+                    country.addToCitys(city)
+                    try context.save()
+                    countrys.append(country)
+                    view?.tableView.reloadData()
+    // Fetch something
+                    print("new city&country save")
+                }
+            } catch let error as NSError {
+                print(error.localizedDescription)
+            }
+        }
+    }
 }
