@@ -12,6 +12,7 @@ struct CitySearch: Codable {
     let latitude: Double
     let longitude: Double
     var country: String
+    var isoA2: String?
     let population: Int?
     let isCapital: Bool
 

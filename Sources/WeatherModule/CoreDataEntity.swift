@@ -10,6 +10,8 @@ import CoreData
 
 public final class Country: NSManagedObject {
     @NSManaged var name: String
+    @NSManaged var isoA2: String
+    @NSManaged var flagData: Data?
     @NSManaged public var citys: NSSet?
     
     public var citysArray: [City] {
@@ -88,6 +90,15 @@ func managedObjectModel() -> NSManagedObjectModel {
     countryNameAttr.name = "name"
     countryNameAttr.attributeType = .stringAttributeType
     
+    let countryIsoA2Attr = NSAttributeDescription()
+    countryIsoA2Attr.name = "isoA2"
+    countryIsoA2Attr.attributeType = .stringAttributeType
+    
+    let countryFlagDataAttr = NSAttributeDescription()
+    countryFlagDataAttr.name = "flagData"
+    countryFlagDataAttr.attributeType = .binaryDataAttributeType
+    countryFlagDataAttr.isOptional = true
+    
     
     // MARK: - CityEntity
     
@@ -133,7 +144,7 @@ func managedObjectModel() -> NSManagedObjectModel {
     
     
     // Set properties
-    countryEnt.properties = [countryNameAttr, countryToCity]
+    countryEnt.properties = [countryNameAttr, countryIsoA2Attr, countryFlagDataAttr, countryToCity]
     cityEnt.properties = [nameAttr,
                           isCapitalAttr,
                           latitudeAttr,

@@ -80,6 +80,7 @@ public class SearchViewController: UIViewController {
         super.viewDidLoad()
         
         initialize()
+        textField.becomeFirstResponder()
     }
 }
 

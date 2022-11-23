@@ -34,6 +34,7 @@ class MainPresenter {
         self.interactor = interactor
         self.router = router
         
+   //     resetAllRecords()
         fetchCountrys()
         view?.tableView.reloadData()
     }
@@ -49,7 +50,7 @@ class MainPresenter {
         
         do {
             countrys = try context.fetch(fetchRequest)
-            print(countrys.count)
+            print("countrys.count = \(countrys.count)")
         } catch let error as NSError {
             print(error.localizedDescription)
         }
@@ -103,7 +104,9 @@ extension MainPresenter: MainPresenterDelegate {
             return city
         }
         
+        
         if let country = countrys.filter({ $0.name == citySearch.country }).first {
+            // Create only city
             do {
                 if country.citysArray.filter({ $0.name == citySearch.name }).first == nil {
                     
@@ -120,12 +123,30 @@ extension MainPresenter: MainPresenterDelegate {
             }
             
         } else {
-            
+            // Create country and city
             do {
                 guard let entity = NSEntityDescription.entity(forEntityName: "Country", in: context) else { return }
                 
                 let country = Country(entity: entity , insertInto: context)
                 country.name = citySearch.country
+                
+                if citySearch.isoA2 != nil {
+                    country.isoA2 = citySearch.isoA2!
+                    interactor.fetchFlagImg(isoA2: citySearch.isoA2!) { [weak self] flagData in
+                        print("##### flag data =")
+                        print(flagData)
+                        country.flagData = flagData
+                        do {
+                            try context.save()
+                            self?.view?.tableView.reloadData()
+                        } catch let error as NSError {
+                            print(error.localizedDescription)
+                        }
+                    }
+                } else {
+                    print("citySearch.isoA2 == nil")
+                }
+                
                 
                 if let city = createCity(citySearch, country) {
                     country.addToCitys(city)

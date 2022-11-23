@@ -50,8 +50,6 @@ public class MainViewController: UIViewController {
         tv.dataSource = self
         tv.register(MainCell.self, forCellReuseIdentifier: "cell")
         tv.backgroundColor = .clear
-//        tv.keyboardDismissMode = .onDrag
-    //    tv.separatorStyle = .singleLine
         
         return tv
     }()
@@ -137,17 +135,14 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
-    // MARK: - Headers Method
-//    public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        return presenter.countrys[section].name
-//    }
-    
+    // MARK: - Headers Method&UI
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         
         lazy var headerView: UIView = {
-            let view = UIView.init(frame: CGRect.init(x: 0, y: 0,
-                                                      width: tableView.frame.width,
-                                                      height: 50))
+            let view = UIView()
+            view.frame = CGRect.init(x: 0, y: 0,
+                                    width: tableView.frame.width,
+                                    height: 50)
             view.backgroundColor = .gray
             view.layer.cornerRadius = 15.0
             view.layer.borderWidth = 1.0
@@ -156,24 +151,8 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             return view
         }()
         
-        lazy var countryImageView : UIImageView = {
-            let img = UIImageView()
-            img.backgroundColor = .red
-            img.frame = CGRect.init(x: 2, y: 2,
-                                    width: 26,
-                                    height: 26)
-            img.contentMode = .scaleAspectFill
-            img.translatesAutoresizingMaskIntoConstraints = false
-            img.layer.cornerRadius = 13
-            img.clipsToBounds = true
-            return img
-        }()
-        
         lazy var headerLabel: UILabel = {
             let label = UILabel()
-            label.frame = CGRect.init(x: 30, y: -4,
-                                      width: headerView.frame.width/1.5,
-                                      height: headerView.frame.height-10)
             label.font = .systemFont(ofSize: 12)
             label.font = UIFont.preferredFont(forTextStyle: .title3)
             label.textColor = .black
@@ -181,15 +160,94 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             return label
         }()
         
+        lazy var activityView: UIActivityIndicatorView = {
+            let activity = UIActivityIndicatorView(style: .medium)
+            activity.contentMode = .center
+            
+            return activity
+        }()
+        
+        lazy var countryImageView: UIImageView = {
+            let imageView = UIImageView()
+            imageView.backgroundColor = .clear
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            imageView.clipsToBounds = true
+            return imageView
+        }()
+        
+        if presenter.countrys[section].flagData != nil {
+            let img = UIImage(data: presenter.countrys[section].flagData!)
+            countryImageView.image = img?.resize(60)
+            countryImageView.contentMode = .scaleAspectFill
+            countryImageView.layer.cornerRadius = 13
+            countryImageView.clipsToBounds = true
+            
+            if activityView.isAnimating {
+                activityView.stopAnimating()
+            }
+        } else {
+            
+            headerView.addSubview(activityView)
+            activityView.snp.makeConstraints { make in
+                make.centerY.equalToSuperview()
+                make.left.equalToSuperview().offset(2)
+                make.height.equalToSuperview().offset(-4)
+                make.width.equalTo(26)
+            }
+            
+            activityView.startAnimating()
+                        print("flag == nil")
+        }
+        
         headerView.addSubview(countryImageView)
         headerView.addSubview(headerLabel)
+                
+        countryImageView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.left.equalToSuperview().offset(2)
+            make.height.equalToSuperview().offset(-4)
+            make.width.equalTo(26)
+        }
+           
+        headerLabel.snp.makeConstraints { make in
+            make.left.equalTo(countryImageView.snp.right).offset(2)
+            make.bottom.equalTo(headerView).offset(-2)
+            make.height.equalTo(headerView).offset(-4)
+            make.right.equalTo(headerView).offset(-12)
+        }
         
         headerLabel.text = presenter.countrys[section].name
-        
+ 
         return headerView
     }
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 30
     }
+}
+
+
+
+// Method for resize flag Image
+extension UIImage {
+    func resize(_ max_size: CGFloat) -> UIImage {
+         let max_size_pixels = max_size / UIScreen.main.scale
+         let aspectRatio =  size.width/size.height
+         var width: CGFloat
+         var height: CGFloat
+         var newImage: UIImage
+         if aspectRatio > 1 {
+             width = max_size_pixels
+             height = max_size_pixels / aspectRatio
+         } else {
+             height = max_size_pixels
+             width = max_size_pixels * aspectRatio
+         }
+         let renderer = UIGraphicsImageRenderer(size: CGSize(width: width, height: height), format: UIGraphicsImageRendererFormat.default())
+         newImage = renderer.image {
+             (context) in
+             self.draw(in: CGRect(x: 0, y: 0, width: width, height: height))
+         }
+         return newImage
+     }
 }

@@ -49,6 +49,7 @@ class SearchInteractor: SearchInteractorProtocol {
                             
                             for iso in Iso3166_1a2.all {
                                 if iso.rawValue == city.country {
+                                    city.isoA2 = iso.rawValue
                                     city.country = iso.country
                                 }
                             }
