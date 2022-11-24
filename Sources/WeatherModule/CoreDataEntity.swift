@@ -50,7 +50,9 @@ public final class City: NSManagedObject {
     @NSManaged var isCapital: Bool
     @NSManaged var latitude: Double
     @NSManaged var longitude: Double
+
     @NSManaged var country: Country
+    @NSManaged var timeAndTemp: TimeAndTemp
 }
 
 extension City: Identifiable {
@@ -59,6 +61,21 @@ extension City: Identifiable {
     }
 }
 
+public final class TimeAndTemp: NSManagedObject {
+    @NSManaged var temp: Double
+    @NSManaged var utcDiff: Double
+    
+    @NSManaged var city: City
+}
+
+extension TimeAndTemp: Identifiable {
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<TimeAndTemp> {
+        return NSFetchRequest<TimeAndTemp>(entityName: "TimeAndTemp")
+    }
+}
+
+
+// MARK: - Persistent Container
 var persistentContainer: NSPersistentContainer = {
     let container = NSPersistentCloudKitContainer(name: "ExampleModel", managedObjectModel: managedObjectModel())
     
@@ -86,6 +103,7 @@ func managedObjectModel() -> NSManagedObjectModel {
     countryEnt.managedObjectClassName = NSStringFromClass(Country.self)
     
     // Attributes
+    
     let countryNameAttr = NSAttributeDescription()
     countryNameAttr.name = "name"
     countryNameAttr.attributeType = .stringAttributeType
@@ -107,6 +125,7 @@ func managedObjectModel() -> NSManagedObjectModel {
     cityEnt.managedObjectClassName = NSStringFromClass(City.self)
     
     // Attributes
+    
     let nameAttr = NSAttributeDescription()
     nameAttr.name = "name"
     nameAttr.attributeType = .stringAttributeType
@@ -124,6 +143,23 @@ func managedObjectModel() -> NSManagedObjectModel {
     longitudeAttr.attributeType = .doubleAttributeType
     
     
+    // MARK: - TimeAndTempEntity
+    
+    let timeAndTempEnt = NSEntityDescription()
+    timeAndTempEnt.name = "TimeAndTemp"
+    timeAndTempEnt.managedObjectClassName = NSStringFromClass(TimeAndTemp.self)
+    
+    // Attributes
+    
+    let tempAttr = NSAttributeDescription()
+    tempAttr.name = "temp"
+    tempAttr.attributeType = .doubleAttributeType
+    
+    let utcDiffAttr = NSAttributeDescription()
+    utcDiffAttr.name = "utcDiff"
+    utcDiffAttr.attributeType = .doubleAttributeType
+    
+    
     // MARK: - Relationships
     
     let countryToCity = NSRelationshipDescription()
@@ -137,9 +173,24 @@ func managedObjectModel() -> NSManagedObjectModel {
     cityToCountry.maxCount = 1
     cityToCountry.deleteRule = .nullifyDeleteRule
     
+    let cityToTime = NSRelationshipDescription()
+    cityToTime.name = "timeAndTemp"
+    cityToTime.destinationEntity = timeAndTempEnt
+    cityToTime.maxCount = 1
+    cityToTime.deleteRule = .cascadeDeleteRule
+    
+    let timeToCity = NSRelationshipDescription()
+    timeToCity.name = "city"
+    timeToCity.destinationEntity = cityEnt
+    timeToCity.maxCount = 1
+    timeToCity.deleteRule = .nullifyDeleteRule
+    
     // Inverse relationships
     countryToCity.inverseRelationship = cityToCountry
     cityToCountry.inverseRelationship = countryToCity
+    
+    cityToTime.inverseRelationship = timeToCity
+    timeToCity.inverseRelationship = cityToTime
     
     
     
@@ -149,9 +200,14 @@ func managedObjectModel() -> NSManagedObjectModel {
                           isCapitalAttr,
                           latitudeAttr,
                           longitudeAttr,
-                          cityToCountry]
+                          tempAttr,
+                          utcDiffAttr,
+                          cityToCountry,
+                          cityToTime]
+    timeAndTempEnt.properties = [tempAttr, utcDiffAttr, timeToCity]
     
-    model.entities = [countryEnt,cityEnt]
+    
+    model.entities = [countryEnt,cityEnt,timeAndTempEnt]
     
     return model
 }

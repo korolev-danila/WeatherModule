@@ -25,14 +25,38 @@ class MainCell: UITableViewCell {
         return label
     }()
     
-    private let countryLabel: UILabel = {
+    private let timeLabel: UILabel = {
        let label = UILabel()
-        label.text = "Country label"
+        label.text = "10:00"
         label.font = UIFont.systemFont(ofSize: 20)
         label.adjustsFontSizeToFitWidth = true
         label.numberOfLines = 3
         label.minimumScaleFactor = 0.02
         label.baselineAdjustment = .alignBaselines
+        label.textAlignment  = .right
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
+    }()
+    
+    private let tempLabel: UILabel = {
+       let label = UILabel()
+        label.text = "0"
+        label.font = UIFont.systemFont(ofSize: 20)
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 3
+        label.minimumScaleFactor = 0.02
+        label.baselineAdjustment = .alignBaselines
+        label.textAlignment  = .right
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
+    }()
+    
+    private let cLabel: UILabel = {
+       let label = UILabel()
+        label.text = "\u{2103}"
+        label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment  = .right
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -53,7 +77,9 @@ class MainCell: UITableViewCell {
         self.selectionStyle = .none
         
         self.addSubview(nameLabel)
-        self.addSubview(countryLabel)
+        self.addSubview(tempLabel)
+        self.addSubview(cLabel)
+        self.addSubview(timeLabel)
 
         nameLabel.snp.makeConstraints { make in
             make.leading.equalTo(12)
@@ -61,15 +87,31 @@ class MainCell: UITableViewCell {
             make.top.equalTo(2)
             make.bottom.equalTo(-2)
         }
-        countryLabel.snp.makeConstraints { make in
-            make.leading.equalTo(self.snp.centerX)
-            make.trailing.equalTo(-10)
+        
+        tempLabel.snp.makeConstraints { make in
+            make.trailing.equalTo(cLabel.snp.leading)
             make.top.equalTo(2)
             make.bottom.equalTo(-2)
         }
+        
+        cLabel.snp.makeConstraints { make in
+            make.trailing.equalTo(timeLabel.snp.leading).offset(-10)
+            make.top.equalTo(2)
+            make.bottom.equalTo(-2)
+        }
+        
+        timeLabel.snp.makeConstraints { make in
+            make.trailing.equalTo(-8)
+            make.width.equalTo(50)
+            make.top.equalTo(2)
+            make.bottom.equalTo(-2)
+        }
+        
     }
     
-    func configureCell(city: City) {
+    func configureCell(city: City, time: String) {
         nameLabel.text = city.name
+        tempLabel.text = "\(Int(city.timeAndTemp.temp))"
+        timeLabel.text = time 
     }
 }

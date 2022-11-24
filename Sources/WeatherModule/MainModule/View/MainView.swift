@@ -131,7 +131,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath) as! MainCell
         let city = presenter.countrys[indexPath.section].citysArray[indexPath.row]
         
-        cell.configureCell(city: city)
+        cell.configureCell(city: city, time: presenter.updateTime(city: city))
         
         return cell
     }

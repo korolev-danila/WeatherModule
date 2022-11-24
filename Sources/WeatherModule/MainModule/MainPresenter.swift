@@ -10,11 +10,11 @@ import CoreData
 
 protocol MainPresenterProtocol: AnyObject {
     
-    var citys: [CitySearch] { get set }
     var countrys: [Country] { get set }
     
     func didTapButton()
     func showDetails(index: IndexPath)
+    func updateTime(city: City) -> String
 }
 
 protocol MainPresenterDelegate: AnyObject  {
@@ -23,22 +23,27 @@ protocol MainPresenterDelegate: AnyObject  {
 }
 
 class MainPresenter {
- 
+    
     weak var view: MainViewProtocol?
     var router: MainRouterProtocol
     var interactor: MainInteractorProtocol
     
-    var citys = [CitySearch]()
     var countrys = [Country]()
+    
+    var timer: Timer?
     
     init(interactor: MainInteractorProtocol, router: MainRouterProtocol){
         self.interactor = interactor
         self.router = router
         
-   //     resetAllRecords()
+        //     resetAllRecords()
+        //   searchCountCityAndTempEntity()
+        
         fetchCountrys()
-        view?.tableView.reloadData()
+        startTimer()
+        updateAllTemp()
     }
+    
     
     // MARK: - Router Method
     func didTapButton() {
@@ -74,18 +79,97 @@ class MainPresenter {
         }
     }
     
-//    func deleteCoin(_ coinCD: CoinCD) {
-//
-//        context.delete(coinCD)
-//
-//        do {
-//            try context.save()
-//            self.fetchMyCoins()
-//        } catch let error as NSError {
-//            print(error.localizedDescription)
-//        }
-//    }
+    func searchCountCityAndTempEntity() {
 
+        let fetchRequest: NSFetchRequest<City> = City.fetchRequest()
+        let fetchRequest2: NSFetchRequest<TimeAndTemp> = TimeAndTemp.fetchRequest()
+        
+        do {
+            let citys = try context.fetch(fetchRequest)
+            let timeAndTemp = try context.fetch(fetchRequest2)
+            
+            print("citys.count = \(citys.count)")
+            print("timeAndTemp.count = \(timeAndTemp.count)")
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func deleteCity(_ city: City) {
+        
+        context.delete(city)
+        
+        do {
+            try context.save()
+            self.fetchCountrys()
+            self.view?.tableView.reloadData()
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+    }
+    
+    
+    // MARK: - Update properties
+    func startTimer() {
+        if  timer == nil {
+            let timer = Timer(timeInterval: 60.0,
+                              target: self,
+                              selector: #selector(reloadTable),
+                              userInfo: nil,
+                              repeats: true)
+            RunLoop.current.add(timer, forMode: .common)
+            timer.tolerance = 0.1
+            
+            self.timer = timer
+        }
+        
+        print("updateTime")
+    }
+    
+    @objc func reloadTable() {
+        view?.tableView.reloadData()
+    }
+    
+    func updateTime(city: City) -> String {
+        
+        let time = Date() + city.timeAndTemp.utcDiff - (3*60*60) // Moscow +3UTC
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        let timeString = formatter.string(from: time)
+        
+        return timeString
+    }
+    
+    func updateAllTemp() {
+        DispatchQueue.main.async {
+            for country in self.countrys {
+                for city in country.citysArray {
+                    self.updateTemp(to: city)
+                }
+            }
+        }
+    }
+    
+    
+    func updateTemp(to city: City) {
+        
+        self.interactor.fetchWeaher(forCity: city) { [weak self] weather in
+            
+            if weather.fact?.temp != nil {
+                city.timeAndTemp.temp = weather.fact!.temp!
+            }
+            if weather.info?.tzinfo?.offset != nil {
+                city.timeAndTemp.utcDiff = weather.info!.tzinfo!.offset!
+            }
+            
+            do {
+                try context.save()
+                self?.view?.tableView.reloadData()
+            } catch let error as NSError {
+                print(error.localizedDescription)
+            }
+        }
+    }
 }
 
 extension MainPresenter: MainPresenterProtocol {
@@ -107,12 +191,27 @@ extension MainPresenter: MainPresenterDelegate {
             city.latitude = citySearch.latitude
             city.longitude = citySearch.longitude
             
+            if let timeAndTemp = createTimeAndTemp(for: city) {
+                city.timeAndTemp = timeAndTemp
+            }
+            
             return city
         }
         
+        func createTimeAndTemp(for city: City) -> TimeAndTemp? {
+            guard let timeAndTempEntity = NSEntityDescription.entity(forEntityName: "TimeAndTemp", in: context) else { return nil }
+            
+            let timeAndTemp = TimeAndTemp(entity: timeAndTempEntity, insertInto: context)
+            timeAndTemp.city = city
+            timeAndTemp.temp = 0.0
+            timeAndTemp.utcDiff = 0.0
+            
+            return timeAndTemp
+        }
         
+        // Create only city
         if let country = countrys.filter({ $0.name == citySearch.country }).first {
-            // Create only city
+            
             do {
                 if country.citysArray.filter({ $0.name == citySearch.name }).first == nil {
                     
@@ -120,6 +219,10 @@ extension MainPresenter: MainPresenterDelegate {
                         country.addToCitys(city)
                         try context.save()
                         view?.tableView.reloadData()
+                        
+                        DispatchQueue.main.async {
+                            self.updateTemp(to: city)
+                        }
                     }
                 } else {
                     print("try save old city")
@@ -139,9 +242,9 @@ extension MainPresenter: MainPresenterDelegate {
                 if citySearch.isoA2 != nil {
                     country.isoA2 = citySearch.isoA2!
                     interactor.fetchFlagImg(isoA2: citySearch.isoA2!) { [weak self] flagData in
-                        print("##### flag data =")
-                        print(flagData)
+                        
                         country.flagData = flagData
+                        
                         do {
                             try context.save()
                             self?.view?.tableView.reloadData()
@@ -159,7 +262,10 @@ extension MainPresenter: MainPresenterDelegate {
                     try context.save()
                     countrys.append(country)
                     view?.tableView.reloadData()
-    // Fetch something
+                    
+                    DispatchQueue.main.async {
+                        self.updateTemp(to: city)
+                    }
                     print("new city&country save")
                 }
             } catch let error as NSError {

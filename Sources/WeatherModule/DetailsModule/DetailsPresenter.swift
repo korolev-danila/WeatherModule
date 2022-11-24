@@ -24,6 +24,10 @@ class DetailsPresenter {
         self.interactor = interactor
         self.router = router
         self.city = city
+        
+        self.interactor.fetchWeaher(forCity: city) { weather in
+            
+        }
     }
 }
 
