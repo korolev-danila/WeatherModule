@@ -14,6 +14,7 @@ protocol MainPresenterProtocol: AnyObject {
     var countrys: [Country] { get set }
     
     func didTapButton()
+    func showDetails(index: IndexPath)
 }
 
 protocol MainPresenterDelegate: AnyObject  {
@@ -39,8 +40,13 @@ class MainPresenter {
         view?.tableView.reloadData()
     }
     
+    // MARK: - Router Method
     func didTapButton() {
         router.pushSearchView()
+    }
+    
+    func showDetails(index: IndexPath) {
+        router.pushDetailsView(city: countrys[index.section].citysArray[index.row])
     }
     
     // MARK: - CoreData layer

@@ -6,21 +6,31 @@
 //
 
 import Foundation
+import UIKit
 
 protocol MainRouterProtocol: AnyObject {
     func pushSearchView()
+    func pushDetailsView(city: City)
 }
 
 class MainRouter: MainRouterProtocol {
-    weak var view: MainViewController?
+    weak var navigationController: UINavigationController?
     weak var delegate: MainPresenterDelegate?
     
     func pushSearchView() {
         if delegate != nil {
             let vc = SearchModulBuider.build(delegate: delegate!)
-            view?.showDetailViewController(vc, sender: nil)
+            navigationController?.showDetailViewController(vc, sender: nil)
         } else {
             print("MainPresenterDelegate == nil")
+        }
+    }
+    
+    func pushDetailsView(city: City) {
+        if navigationController != nil {
+            let vc = DetailsModulBuider.build(nc: navigationController!, city: city)
+            print("push Details")
+            navigationController!.pushViewController(vc, animated: true)
         }
     }
 }
