@@ -14,6 +14,7 @@ protocol MainPresenterProtocol: AnyObject {
     
     func didTapButton()
     func showDetails(index: IndexPath)
+    func deleteCity(for index: IndexPath)
     func updateTime(city: City) -> String
 }
 
@@ -67,6 +68,25 @@ class MainPresenter {
         }
     }
     
+    func deleteCity(for index: IndexPath) {
+        
+        if countrys[index.section].citysArray.count == 1 {
+            context.delete(countrys[index.section])
+        } else {
+            let city = countrys[index.section].citysArray[index.row]
+            
+            context.delete(city)
+        }
+        
+        do {
+            try context.save()
+            self.fetchCountrys()
+            self.view?.tableView.reloadData()
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+    }
+    
     func resetAllRecords() {
         
         let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Country")
@@ -90,19 +110,6 @@ class MainPresenter {
             
             print("citys.count = \(citys.count)")
             print("timeAndTemp.count = \(timeAndTemp.count)")
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-    }
-    
-    func deleteCity(_ city: City) {
-        
-        context.delete(city)
-        
-        do {
-            try context.save()
-            self.fetchCountrys()
-            self.view?.tableView.reloadData()
         } catch let error as NSError {
             print(error.localizedDescription)
         }
@@ -177,6 +184,7 @@ extension MainPresenter: MainPresenterProtocol {
     
 }
 
+// MARK: - MainPresenterDelegate
 extension MainPresenter: MainPresenterDelegate {
     
     func save(_ citySearch: CitySearch) {

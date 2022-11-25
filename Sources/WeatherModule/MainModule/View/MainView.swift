@@ -17,14 +17,7 @@ public class MainViewController: UIViewController {
     
     var presenter: MainPresenterProtocol!
     
-    let titleLabel: UILabel = {
-        let l = UILabel()
-        l.text = "Weather App"
-        l.font = UIFont.preferredFont(forTextStyle: .title1)
-        l.textAlignment = .center
-        
-        return l 
-    }()
+    var deleteIsHidden = true 
     
     let searchButton: UIButton = {
         let button = UIButton()
@@ -68,21 +61,15 @@ public class MainViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         initialize()
+        settingNC()
     }
     
     private func initialize() {
         
         view.backgroundColor = .white
         
-        view.addSubview(titleLabel)
         view.addSubview(tableView)
         view.addSubview(searchButton)
-        
-        titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(30)
-            make.centerX.equalToSuperview()
-            make.height.equalTo(40)
-        }
 
         searchButton.snp.makeConstraints { make in
             make.bottom.equalToSuperview().inset(80.0)
@@ -92,12 +79,41 @@ public class MainViewController: UIViewController {
         }
 
         tableView.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(5)
+            make.top.equalToSuperview().offset(70)
             make.bottom.equalToSuperview()
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
         }
         
+    }
+    
+    func settingNC() {
+        self.navigationController?.navigationBar.topItem?.title = "Weather App"
+        setEditButton()
+    }
+    
+    func setEditButton() {
+
+        let editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editButtonTap))
+        editButton.tintColor = .blue
+        self.navigationController?.navigationBar.topItem?.setLeftBarButton(editButton, animated: true)
+
+    }
+    
+    @objc func editButtonTap() {
+        
+        print("setEdit")
+        deleteIsHidden = false
+        tableView.reloadData()
+        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneButtonTap))
+        doneButton.tintColor = .blue
+        self.navigationItem.setLeftBarButton(doneButton, animated: true)
+    }
+    
+    @objc func doneButtonTap() {
+        setEditButton()
+        deleteIsHidden = true
+        tableView.reloadData()
     }
     
     @objc func didTapButton() {
@@ -109,6 +125,7 @@ extension MainViewController: MainViewProtocol {
     
 }
 
+// MARK: - UITableViewDelegate UITableViewDataSource
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     public func numberOfSections(in tableView: UITableView) -> Int {
         return presenter.countrys.count
@@ -120,7 +137,9 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Num: \(indexPath.row)")
-        presenter.showDetails(index: indexPath)
+        if deleteIsHidden {
+            presenter.showDetails(index: indexPath)
+        }
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -131,7 +150,9 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath) as! MainCell
         let city = presenter.countrys[indexPath.section].citysArray[indexPath.row]
         
-        cell.configureCell(city: city, time: presenter.updateTime(city: city))
+        cell.delegate = self
+        
+        cell.configureCell(city: city, time: presenter.updateTime(city: city), deleteIsHidden: deleteIsHidden)
         
         return cell
     }
@@ -227,7 +248,14 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
-
+// MARK: - MainViewCellDelegate
+extension MainViewController: MainViewCellDelegate {
+    func delete(cell: MainCell) {        
+        if let indexPath = tableView.indexPath(for: cell) {
+            presenter.deleteCity(for: indexPath)
+        }
+    }
+}
 
 // Method for resize flag Image
 extension UIImage {
