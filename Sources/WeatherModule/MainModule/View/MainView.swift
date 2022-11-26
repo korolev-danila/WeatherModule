@@ -17,7 +17,12 @@ public class MainViewController: UIViewController {
     
     var presenter: MainPresenterProtocol!
     
-    var deleteIsHidden = true 
+    var deleteIsHidden = true {
+        didSet {
+            searchButton.isHidden = !deleteIsHidden
+            searchButton.isEnabled = deleteIsHidden
+        }
+    }
     
     let searchButton: UIButton = {
         let button = UIButton()
@@ -217,6 +222,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
                 make.width.equalTo(26)
             }
             
+            presenter.updateFlag(country: presenter.countrys[section])
             activityView.startAnimating()
                         print("flag == nil")
         }

@@ -16,6 +16,7 @@ protocol MainPresenterProtocol: AnyObject {
     func showDetails(index: IndexPath)
     func deleteCity(for index: IndexPath)
     func updateTime(city: City) -> String
+    func updateFlag(country: Country)
 }
 
 protocol MainPresenterDelegate: AnyObject  {
@@ -139,9 +140,10 @@ class MainPresenter {
     
     func updateTime(city: City) -> String {
         
-        let time = Date() + city.timeAndTemp.utcDiff - (3*60*60) // Moscow +3UTC
+        let time = Date() + city.timeAndTemp.utcDiff 
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
         let timeString = formatter.string(from: time)
         
         return timeString
@@ -152,6 +154,25 @@ class MainPresenter {
             for country in self.countrys {
                 for city in country.citysArray {
                     self.updateTemp(to: city)
+                }
+            }
+        }
+    }
+    
+    func updateFlag(country: Country) {
+        
+        DispatchQueue.main.async {
+            
+            
+            self.interactor.fetchFlagImg(isoA2: country.isoA2) { [weak self] flagData in
+                
+                country.flagData = flagData
+                
+                do {
+                    try context.save()
+                    self?.view?.tableView.reloadData()
+                } catch let error as NSError {
+                    print(error.localizedDescription)
                 }
             }
         }
@@ -249,17 +270,6 @@ extension MainPresenter: MainPresenterDelegate {
                 
                 if citySearch.isoA2 != nil {
                     country.isoA2 = citySearch.isoA2!
-                    interactor.fetchFlagImg(isoA2: citySearch.isoA2!) { [weak self] flagData in
-                        
-                        country.flagData = flagData
-                        
-                        do {
-                            try context.save()
-                            self?.view?.tableView.reloadData()
-                        } catch let error as NSError {
-                            print(error.localizedDescription)
-                        }
-                    }
                 } else {
                     print("citySearch.isoA2 == nil")
                 }

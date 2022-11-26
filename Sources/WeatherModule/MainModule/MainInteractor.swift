@@ -26,7 +26,6 @@ class MainInteractor: MainInteractorProtocol {
             switch response.result {
             case .success(let data):
                 
-                print("$$$$")
                 completion(data)
                 
             case .failure(let error):

@@ -26,7 +26,13 @@ class DetailsPresenter {
         self.city = city
         
         self.interactor.fetchWeaher(forCity: city) { weather in
-            
+            print(" %        &&&&&       %")
+            print(weather)
+            print(" %        &&&&&       %")
+            print(weather.fact)
+            print(" %        &&&&&       %")
+            print(weather.forecasts)
+            print(" %        &&&&&       %")
         }
     }
 }
