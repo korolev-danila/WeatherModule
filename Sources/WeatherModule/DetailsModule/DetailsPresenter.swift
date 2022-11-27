@@ -31,8 +31,14 @@ class DetailsPresenter {
             print(" %        &&&&&       %")
             print(weather.fact)
             print(" %        &&&&&       %")
-            print(weather.forecasts)
+            if let arr = weather.forecasts {
+            for item in arr {
+                print(item)
+                print(" %        &&&&&       %")
+            }
+            }
             print(" %        &&&&&       %")
+            print(weather.forecasts?.count)
         }
     }
 }
