@@ -109,6 +109,10 @@ public class DetailsViewController: UIViewController {
     let nameCityLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 22)
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.02
+        label.baselineAdjustment = .alignBaselines
         label.text = "Name of City"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -117,7 +121,7 @@ public class DetailsViewController: UIViewController {
     
     let populationTextCityLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .gray
+        label.backgroundColor = .white
         label.text = "Population:"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -126,7 +130,7 @@ public class DetailsViewController: UIViewController {
     
     let populationCityLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .gray
+        label.backgroundColor = .white
         label.text = "999999999"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -145,6 +149,7 @@ public class DetailsViewController: UIViewController {
     let seasonTextLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.textAlignment  = .right
         label.text = "Season:"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -154,6 +159,8 @@ public class DetailsViewController: UIViewController {
     let seasonLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textAlignment  = .center
         label.text = "summer"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -162,7 +169,8 @@ public class DetailsViewController: UIViewController {
     
     let cloudnessTextLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .gray
+        label.backgroundColor = .white
+        label.textAlignment  = .right
         label.text = "Cloud:"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -171,7 +179,12 @@ public class DetailsViewController: UIViewController {
     
     let cloudnessLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .gray
+        label.backgroundColor = .white
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.02
+        label.baselineAdjustment = .alignBaselines
         label.text = "not cloudness"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -180,7 +193,8 @@ public class DetailsViewController: UIViewController {
     
     let conditionTextLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .gray
+        label.backgroundColor = .white
+        label.textAlignment  = .right
         label.text = "Condition:"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -189,8 +203,14 @@ public class DetailsViewController: UIViewController {
     
     let conditionLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .gray
+        label.backgroundColor = .white
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 2
+        label.minimumScaleFactor = 0.02
+        label.baselineAdjustment = .alignBaselines
         label.text = "thunderstorm-with-rain"
+        label.textAlignment  = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         
         return label
@@ -204,6 +224,82 @@ public class DetailsViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         
         return view
+    }()
+    
+    let windSpeedTextLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .white
+        label.textAlignment  = .right
+        label.text = "Wind speed:"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
+    }()
+    
+    let windSpeedLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .white
+        label.text = "120 m/c"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
+    }()
+    
+    let windGustTextLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .white
+        label.textAlignment  = .right
+        label.text = "Wind gust:"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
+    }()
+    
+    let windGustLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .white
+        label.text = "120 m/c"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
+    }()
+    
+    let windDirTextLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .white
+        label.textAlignment  = .right
+        label.text = "Direction:"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
+    }()
+    
+    let windDirLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .white
+        label.text = "southwest"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
+    }()
+    
+    let pressureMmTextLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .white
+        label.textAlignment  = .right
+        label.text = "Pressure:"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
+    }()
+    
+    let pressureMmLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .white
+        label.text = "100 mm"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
     }()
     
 //
@@ -294,7 +390,24 @@ public class DetailsViewController: UIViewController {
         cityView.addSubview(nameCityLabel)
         cityView.addSubview(populationTextCityLabel)
         cityView.addSubview(populationCityLabel)
+        cityView.addSubview(seasonView)
+        cityView.addSubview(windView)
         
+        seasonView.addSubview(seasonTextLabel)
+        seasonView.addSubview(seasonLabel)
+        seasonView.addSubview(cloudnessTextLabel)
+        seasonView.addSubview(cloudnessLabel)
+        seasonView.addSubview(conditionTextLabel)
+        seasonView.addSubview(conditionLabel)
+        
+        windView.addSubview(windSpeedTextLabel)
+        windView.addSubview(windSpeedLabel)
+        windView.addSubview(windGustTextLabel)
+        windView.addSubview(windGustLabel)
+        windView.addSubview(windDirTextLabel)
+        windView.addSubview(windDirLabel)
+        windView.addSubview(pressureMmTextLabel)
+        windView.addSubview(pressureMmLabel)
         
         barButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         let leftBarButton = UIBarButtonItem(customView: barButton)
@@ -320,25 +433,124 @@ public class DetailsViewController: UIViewController {
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.top.equalToSuperview()
-            make.height.equalTo(UIScreen.main.bounds.height / 5)
+            make.height.equalTo(UIScreen.main.bounds.height / 5.2)
         }
         
         
         nameCityLabel.snp.makeConstraints { make in
-            make.leading.equalTo(6)
+            make.leading.equalTo(12)
             make.top.equalTo(6)
         }
         
         populationTextCityLabel.snp.makeConstraints { make in
-            make.top.equalTo(nameCityLabel.snp.bottom).offset(8)
-            make.leading.equalTo(6)
+            make.top.equalTo(nameCityLabel.snp.bottom).offset(16)
+            make.leading.equalTo(12)
         }
         
         populationCityLabel.snp.makeConstraints { make in
-            make.top.equalTo(nameCityLabel.snp.bottom).offset(8)
+            make.top.equalTo(nameCityLabel.snp.bottom).offset(16)
             make.leading.equalTo(populationTextCityLabel.snp.trailing).offset(4)
         }
         
+        // MARK: - seasonView.snp.makeConstraints
+        seasonView.snp.makeConstraints { make in
+            make.top.equalTo(populationTextCityLabel.snp.bottom).offset(8)
+            make.leading.equalToSuperview()
+            make.trailing.equalTo(cityView.snp.centerX)
+            make.bottom.equalToSuperview()
+        }
+        seasonTextLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview().offset(6)
+            make.trailing.equalTo(seasonView.snp.centerX).offset(-10)
+            make.height.equalTo(20)
+        }
+        seasonLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.leading.equalTo(seasonView.snp.centerX).offset(-2)
+            make.trailing.equalToSuperview()
+            make.height.equalTo(20)
+        }
+        cloudnessTextLabel.snp.makeConstraints { make in
+            make.top.equalTo(seasonTextLabel.snp.bottom).offset(4)
+            make.leading.equalToSuperview().offset(6)
+            make.trailing.equalTo(seasonView.snp.centerX).offset(-10)
+            make.height.equalTo(20)
+        }
+        cloudnessLabel.snp.makeConstraints { make in
+            make.top.equalTo(seasonTextLabel.snp.bottom).offset(4)
+            make.leading.equalTo(seasonView.snp.centerX).offset(-2)
+            make.trailing.equalToSuperview()
+            make.height.equalTo(20)
+        }
+        conditionTextLabel.snp.makeConstraints { make in
+            make.top.equalTo(cloudnessTextLabel.snp.bottom).offset(4)
+            make.leading.equalToSuperview().offset(6)
+            make.trailing.equalTo(seasonView.snp.centerX).offset(-10)
+            make.height.equalTo(20)
+        }
+        conditionLabel.snp.makeConstraints { make in
+            make.top.equalTo(cloudnessTextLabel.snp.bottom).offset(4)
+            make.leading.equalTo(conditionTextLabel.snp.trailing).offset(-2)
+            make.trailing.equalToSuperview()
+            make.height.equalTo(40)
+        }
+        
+        // MARK: - windView.snp.makeConstraints
+        windView.snp.makeConstraints { make in
+            make.top.equalTo(populationTextCityLabel.snp.bottom).offset(8)
+            make.leading.equalTo(cityView.snp.centerX).offset(-12)
+            make.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
+        }
+        windSpeedTextLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview().offset(6)
+            make.trailing.equalTo(windView.snp.centerX)
+            make.height.equalTo(20)
+        }
+        windSpeedLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.leading.equalTo(windView.snp.centerX).offset(6)
+            make.trailing.equalToSuperview()
+            make.height.equalTo(20)
+        }
+        windGustTextLabel.snp.makeConstraints { make in
+            make.top.equalTo(windSpeedTextLabel.snp.bottom).offset(4)
+            make.leading.equalToSuperview().offset(6)
+            make.trailing.equalTo(windView.snp.centerX)
+            make.height.equalTo(20)
+        }
+        windGustLabel.snp.makeConstraints { make in
+            make.top.equalTo(windSpeedTextLabel.snp.bottom).offset(4)
+            make.leading.equalTo(windView.snp.centerX).offset(6)
+            make.trailing.equalToSuperview()
+            make.height.equalTo(20)
+        }
+        windDirTextLabel.snp.makeConstraints { make in
+            make.top.equalTo(windGustTextLabel.snp.bottom).offset(4)
+            make.leading.equalToSuperview().offset(6)
+            make.trailing.equalTo(windView.snp.centerX)
+            make.height.equalTo(20)
+        }
+        windDirLabel.snp.makeConstraints { make in
+            make.top.equalTo(windGustTextLabel.snp.bottom).offset(4)
+            make.leading.equalTo(windView.snp.centerX).offset(6)
+            make.trailing.equalToSuperview()
+            make.height.equalTo(20)
+        }
+        pressureMmTextLabel.snp.makeConstraints { make in
+            make.top.equalTo(windDirTextLabel.snp.bottom).offset(4)
+            make.leading.equalToSuperview().offset(6)
+            make.trailing.equalTo(windView.snp.centerX)
+            make.height.equalTo(20)
+        }
+        pressureMmLabel.snp.makeConstraints { make in
+            make.top.equalTo(windDirTextLabel.snp.bottom).offset(4)
+            make.leading.equalTo(windView.snp.centerX).offset(6)
+            make.trailing.equalToSuperview()
+            make.height.equalTo(20)
+        }
          
         // MARK: - collectionView.snp.makeConstraints
         collectionView.snp.makeConstraints { make in
