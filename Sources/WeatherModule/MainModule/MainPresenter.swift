@@ -75,7 +75,6 @@ class MainPresenter {
             context.delete(countrys[index.section])
         } else {
             let city = countrys[index.section].citysArray[index.row]
-            
             context.delete(city)
         }
         
@@ -162,8 +161,6 @@ class MainPresenter {
     func updateFlag(country: Country) {
         
         DispatchQueue.main.async {
-            
-            
             self.interactor.fetchFlagImg(isoA2: country.isoA2) { [weak self] flagData in
                 
                 country.flagData = flagData
@@ -219,7 +216,11 @@ extension MainPresenter: MainPresenterDelegate {
             city.isCapital = citySearch.isCapital
             city.latitude = citySearch.latitude
             city.longitude = citySearch.longitude
-            
+            if citySearch.population != nil {
+                city.population = Double(citySearch.population!)
+            } else {
+                city.population = 0.0
+            }
             if let timeAndTemp = createTimeAndTemp(for: city) {
                 city.timeAndTemp = timeAndTemp
             }

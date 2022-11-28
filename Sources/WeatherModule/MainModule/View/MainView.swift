@@ -203,15 +203,27 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         }()
         
         if presenter.countrys[section].flagData != nil {
+            if activityView.isAnimating {
+                activityView.stopAnimating()
+            }
+            if UIImage(data: presenter.countrys[section].flagData!) == nil {
+                print("!%%%%%!%%%!%%!%!%!%")
+                presenter.updateFlag(country: presenter.countrys[section])
+                activityView.startAnimating()
+                headerView.addSubview(activityView)
+                activityView.snp.makeConstraints { make in
+                    make.centerY.equalToSuperview()
+                    make.left.equalToSuperview().offset(2)
+                    make.height.equalToSuperview().offset(-4)
+                    make.width.equalTo(26)
+                }
+            }
             let img = UIImage(data: presenter.countrys[section].flagData!)
             countryImageView.image = img?.resize(60)
             countryImageView.contentMode = .scaleAspectFill
             countryImageView.layer.cornerRadius = 13
             countryImageView.clipsToBounds = true
             
-            if activityView.isAnimating {
-                activityView.stopAnimating()
-            }
         } else {
             
             headerView.addSubview(activityView)
@@ -222,9 +234,11 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
                 make.width.equalTo(26)
             }
             
-            presenter.updateFlag(country: presenter.countrys[section])
-            activityView.startAnimating()
-                        print("flag == nil")
+            if !activityView.isAnimating {
+                presenter.updateFlag(country: presenter.countrys[section])
+                activityView.startAnimating()
+                print("flag == nil")
+            }
         }
         
         headerView.addSubview(countryImageView)

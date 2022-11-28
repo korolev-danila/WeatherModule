@@ -8,9 +8,32 @@
 import Foundation
 import UIKit
 import SnapKit
+import WebKit
 
 class CollectionCell: UICollectionViewCell {
     
+  //  let vcWebDelegate = VCWebDelegate()
+    
+    lazy var webView: WKWebView = {
+        let preferences = WKPreferences()
+        preferences.javaScriptEnabled = false
+        let configuration = WKWebViewConfiguration()
+        configuration.preferences = preferences
+        let wv = WKWebView(frame: .zero, configuration: configuration)
+        wv.scrollView.isScrollEnabled = false
+        wv.translatesAutoresizingMaskIntoConstraints = false
+        wv.contentMode = .center
+        wv.backgroundColor = .clear
+   //     wv.navigationDelegate = vcWebDelegate
+        return wv
+    }()
+    
+    lazy var iconActivityView: UIActivityIndicatorView = {
+        let activity = UIActivityIndicatorView(style: .medium)
+        activity.contentMode = .center
+        
+        return activity
+    }()
     
     private let dayOfTheWeekLabel: UILabel = {
         let label = UILabel()
@@ -18,7 +41,7 @@ class CollectionCell: UICollectionViewCell {
         label.font = UIFont.systemFont(ofSize: 12)
         label.adjustsFontSizeToFitWidth = true
         label.numberOfLines = 1
-        label.minimumScaleFactor = 0.8
+        label.minimumScaleFactor = 0.05
         label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .left
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -32,21 +55,12 @@ class CollectionCell: UICollectionViewCell {
         label.font = UIFont.systemFont(ofSize: 12)
         label.adjustsFontSizeToFitWidth = true
         label.numberOfLines = 1
-        label.minimumScaleFactor = 0.8
+        label.minimumScaleFactor = 0.05
         label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         
         return label
-    }()
-
-    private let imageView: UIImageView = {
-        let iView = UIImageView()
-        iView.backgroundColor = .yellow
-        iView.contentMode = .scaleAspectFit
-        iView.translatesAutoresizingMaskIntoConstraints = false
-        
-        return iView
     }()
     
     private let tempView: UIView = {
@@ -136,6 +150,7 @@ class CollectionCell: UICollectionViewCell {
         super.init(frame: frame)
         
         setupViews()
+        iconActivityView.startAnimating()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -148,7 +163,8 @@ class CollectionCell: UICollectionViewCell {
         self.addSubview(dateLabel)
         self.addSubview(dayOfTheWeekLabel)
         self.addSubview(tempView)
-        self.addSubview(imageView)
+        self.addSubview(webView)
+        self.addSubview(iconActivityView)
         
         tempView.addSubview(dayTextLabel)
         tempView.addSubview(dayTempLabel)
@@ -158,18 +174,17 @@ class CollectionCell: UICollectionViewCell {
         tempView.addSubview(nightCLabel)
         
         dayOfTheWeekLabel.snp.makeConstraints { make in
-            make.top.equalTo(4)
-            make.leading.equalTo(6)
+            make.top.equalTo(6)
+            make.leading.equalTo(5)
             make.trailing.equalTo(self.snp.centerX).offset(8)
-            make.height.equalTo(14)
-       //     make.width.equalTo(16)
+            make.height.equalTo(12)
         }
         
         dateLabel.snp.makeConstraints { make in
-            make.top.equalTo(4)
-            make.trailing.equalTo(-6)
-            make.leading.equalTo(dayOfTheWeekLabel.snp.trailing).offset(2)
-            make.height.equalTo(14)
+            make.top.equalTo(6)
+            make.trailing.equalTo(-5)
+            make.leading.equalTo(dayOfTheWeekLabel.snp.trailing).offset(1)
+            make.height.equalTo(12)
             
         }
         
@@ -183,77 +198,113 @@ class CollectionCell: UICollectionViewCell {
         
         dayTextLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
-            make.height.equalTo(14)
+            make.height.equalTo(12)
             make.leading.equalToSuperview()
             make.trailing.equalTo(tempView.snp.centerX).offset(-4)
         }
         dayTempLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview()
+            make.bottom.equalTo(dayTextLabel.snp.bottom)
             make.height.equalTo(14)
             make.leading.equalTo(dayTextLabel.snp.trailing).offset(2)
             make.width.equalTo(20)
         }
         dayCLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview()
+            make.top.equalTo(dayTempLabel.snp.top)
             make.height.equalTo(12)
             make.leading.equalTo(dayTempLabel.snp.trailing)
         }
         
         nightTextLabel.snp.makeConstraints { make in
-            make.top.equalTo(dayTextLabel.snp.bottom).offset(2)
-            make.height.equalTo(14)
+            make.top.equalTo(dayTextLabel.snp.bottom)
+            make.height.equalTo(12)
             make.leading.equalToSuperview()
             make.trailing.equalTo(tempView.snp.centerX).offset(-4)
         }
         nightTempLabel.snp.makeConstraints { make in
-            make.top.equalTo(dayTextLabel.snp.bottom).offset(4)
+            make.bottom.equalTo(nightTextLabel.snp.bottom)
             make.height.equalTo(14)
             make.leading.equalTo(nightTextLabel.snp.trailing).offset(2)
             make.width.equalTo(20)
         }
         nightCLabel.snp.makeConstraints { make in
-            make.top.equalTo(dayTextLabel.snp.bottom).offset(4)
+            make.top.equalTo(nightTempLabel.snp.top)
             make.height.equalTo(12)
             make.leading.equalTo(nightTempLabel.snp.trailing)
         }
         
+        webView.snp.makeConstraints { make in
+            make.top.equalTo(tempView.snp.bottom)
+            make.leading.equalToSuperview().offset(14)
+            make.trailing.equalToSuperview().offset(-4)
+            make.bottom.equalToSuperview().offset(-4)
+        }
         
-        imageView.snp.makeConstraints { make in
+        iconActivityView.snp.makeConstraints { make in
             make.top.equalTo(tempView.snp.bottom).offset(4)
             make.leading.equalToSuperview().offset(4)
             make.trailing.equalToSuperview().offset(-4)
             make.bottom.equalToSuperview().offset(-4)
         }
-        
-        
-        
-        
-        
-//        tempLabel.snp.makeConstraints { make in
-//            make.trailing.equalTo(cLabel.snp.leading)
-//            make.top.equalTo(2)
-//            make.bottom.equalTo(-2)
-//        }
-//
-//        cLabel.snp.makeConstraints { make in
-//            make.trailing.equalTo(timeLabel.snp.leading).offset(-10)
-//            make.top.equalTo(2)
-//            make.bottom.equalTo(-2)
-//        }
-//
-//        timeLabel.snp.makeConstraints { make in
-//            make.trailing.equalTo(-8)
-//            make.width.equalTo(50)
-//            make.top.equalTo(2)
-//            make.bottom.equalTo(-2)
-//        }
-        
     }
     
-//    func configureCell(city: City, time: String, deleteIsHidden: Bool) {
-//        nameLabel.text = city.name
-//        tempLabel.text = "\(Int(city.timeAndTemp.temp))"
-//        timeLabel.text = time
-//        self.deleteIsHidden = deleteIsHidden
-//    }
+    func configureCell(weatherDay: Forecasts, heightOfCell: Double) {
+        if weatherDay.parts?.dayShort?.temp != nil { dayTempLabel.text = "\(Int(weatherDay.parts?.dayShort?.temp! ?? 0))" }
+        if weatherDay.parts?.nightShort?.temp != nil {nightTempLabel.text = "\(Int(weatherDay.parts?.nightShort?.temp! ?? 0))"}
+        
+        if weatherDay.date != nil {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+            let date = dateFormatter.date(from: weatherDay.date!)
+            
+            if date != nil {
+                dateFormatter.dateFormat = "dd.MM"
+                let dateStr = dateFormatter.string(from: date!)
+                dateFormatter.dateFormat = "EEEE"
+                let dayOfWeek = dateFormatter.string(from: date!)
+                
+                dateLabel.text = dateStr
+                dayOfTheWeekLabel.text = dayOfWeek
+            }
+        }
+         
+        if weatherDay.svgStr != nil {
+            webView.isHidden = true
+            // Так и не смог понять как без сторонних библиотек вставить нормально svg
+            let svgNew = """
+<svg xmlns="http://www.w3.org/2000/svg" width="\(heightOfCell*2)" height="\(heightOfCell*2)" viewBox="0 2 28 28">
+"""
+            webView.loadHTMLString((svgNew + weatherDay.svgStr!), baseURL: nil)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self.webView.isHidden = false
+                self.iconActivityView.stopAnimating()
+            }
+            
+
+        } else {
+            webView.isHidden = true
+            iconActivityView.startAnimating()
+        }
+    }
 }
+
+//class VCWebDelegate: UIViewController, UIWebViewDelegate {
+//
+//    weak var cell: CollectionCell?
+//
+//    init() {
+//        super.init(nibName: nil, bundle: nil)
+//
+//    }
+//
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
+//
+//    public override func viewDidLoad() {
+//        super.viewDidLoad()
+//
+//    }
+//}
+

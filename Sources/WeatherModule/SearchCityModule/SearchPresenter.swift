@@ -37,7 +37,10 @@ extension SearchPresenter: SearchPresenterProtocol {
     }
     
     func fetchCitys(_ string: String) {
-        view?.showActivityIndicator()
+        if !string.trimmingCharacters(in: .whitespaces).isEmpty {
+            view?.showActivityIndicator()
+        }
+        
         interactor.fetchCitysArray(string: string) { [weak self] data in
             self?.citys = data
             self?.view?.hideActivityIndicator()

@@ -11,6 +11,10 @@ import SnapKit
 
 protocol DetailsViewProtocol: AnyObject {
     
+    var collectionView: UICollectionView { get set }
+    
+    func configureCityView()
+    func configureWeatherView()
 }
 
 public class DetailsViewController: UIViewController {
@@ -94,6 +98,8 @@ public class DetailsViewController: UIViewController {
         return view
     }()
     
+    
+    
     // MARK: - cityView
     let cityView: UIView = {
         let view = UIView()
@@ -104,6 +110,21 @@ public class DetailsViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         
         return view
+    }()
+    
+    lazy var flagImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.backgroundColor = .clear
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        if presenter.city.country.flagData != nil {
+            let img = UIImage(data: presenter.city.country.flagData!)
+            imageView.image = img?.resize(60)
+        }
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 13
+        imageView.clipsToBounds = true
+        
+        return imageView
     }()
     
     let nameCityLabel: UILabel = {
@@ -119,9 +140,26 @@ public class DetailsViewController: UIViewController {
         return label
     }()
     
+    let isCapitalImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.backgroundColor = .clear
+        imageView.image = UIImage(systemName: "star.fill")
+        imageView.tintColor = .yellow
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.isHidden = true
+        
+        return imageView
+    }()
+    
     let populationTextCityLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+       // label.font = UIFont.systemFont(ofSize: 20)
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.02
+        label.textAlignment  = .right
         label.text = "Population:"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -131,11 +169,18 @@ public class DetailsViewController: UIViewController {
     let populationCityLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.font = UIFont.systemFont(ofSize: 18)
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.02
+        label.textAlignment  = .left
         label.text = "999999999"
         label.translatesAutoresizingMaskIntoConstraints = false
         
         return label
     }()
+    
+    
 
     // MARK: - seasonView
     let seasonView: UIView = {
@@ -159,33 +204,9 @@ public class DetailsViewController: UIViewController {
     let seasonLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.textAlignment  = .center
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.textAlignment  = .left
         label.text = "summer"
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
-    }()
-    
-    let cloudnessTextLabel: UILabel = {
-        let label = UILabel()
-        label.backgroundColor = .white
-        label.textAlignment  = .right
-        label.text = "Cloud:"
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
-    }()
-    
-    let cloudnessLabel: UILabel = {
-        let label = UILabel()
-        label.backgroundColor = .white
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.adjustsFontSizeToFitWidth = true
-        label.numberOfLines = 1
-        label.minimumScaleFactor = 0.02
-        label.baselineAdjustment = .alignBaselines
-        label.text = "not cloudness"
         label.translatesAutoresizingMaskIntoConstraints = false
         
         return label
@@ -203,18 +224,19 @@ public class DetailsViewController: UIViewController {
     
     let conditionLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .white
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.backgroundColor = .clear
+        label.font = UIFont.systemFont(ofSize: 16)
         label.adjustsFontSizeToFitWidth = true
         label.numberOfLines = 2
         label.minimumScaleFactor = 0.02
         label.baselineAdjustment = .alignBaselines
         label.text = "thunderstorm-with-rain"
-        label.textAlignment  = .center
+        label.textAlignment  = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         
         return label
     }()
+    
     
     
     // MARK: - windView
@@ -229,6 +251,7 @@ public class DetailsViewController: UIViewController {
     let windSpeedTextLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment  = .right
         label.text = "Wind speed:"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -248,6 +271,7 @@ public class DetailsViewController: UIViewController {
     let windGustTextLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment  = .right
         label.text = "Wind gust:"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -267,6 +291,7 @@ public class DetailsViewController: UIViewController {
     let windDirTextLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment  = .right
         label.text = "Direction:"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -277,6 +302,10 @@ public class DetailsViewController: UIViewController {
     let windDirLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.02
+        label.baselineAdjustment = .alignBaselines
         label.text = "southwest"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -286,6 +315,7 @@ public class DetailsViewController: UIViewController {
     let pressureMmTextLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment  = .right
         label.text = "Pressure:"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -301,31 +331,6 @@ public class DetailsViewController: UIViewController {
         
         return label
     }()
-    
-//
-//    let tempCityLabel: UILabel = {
-//        let label = UILabel()
-//        label.text = "0"
-//        label.font = UIFont.systemFont(ofSize: 20)
-//        label.adjustsFontSizeToFitWidth = true
-//        label.numberOfLines = 3
-//        label.minimumScaleFactor = 0.02
-//        label.baselineAdjustment = .alignBaselines
-//        label.textAlignment  = .right
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//
-//        return label
-//    }()
-//
-//    let cCityLabel: UILabel = {
-//        let label = UILabel()
-//        label.text = "\u{2103}"
-//        label.font = UIFont.systemFont(ofSize: 14)
-//        label.textAlignment  = .right
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//
-//        return label
-//    }()
     
     
     
@@ -371,6 +376,7 @@ public class DetailsViewController: UIViewController {
         super.viewDidLoad()
        
         initialize()
+        presenter.start()
     }
     
     func initialize() {
@@ -387,16 +393,17 @@ public class DetailsViewController: UIViewController {
         bigView.addSubview(collectionView)
         bigView.addSubview(factView)
         
+        cityView.addSubview(flagImageView)
         cityView.addSubview(nameCityLabel)
-        cityView.addSubview(populationTextCityLabel)
-        cityView.addSubview(populationCityLabel)
+        cityView.addSubview(isCapitalImageView)
+
         cityView.addSubview(seasonView)
         cityView.addSubview(windView)
         
+        seasonView.addSubview(populationTextCityLabel)
+        seasonView.addSubview(populationCityLabel)
         seasonView.addSubview(seasonTextLabel)
         seasonView.addSubview(seasonLabel)
-        seasonView.addSubview(cloudnessTextLabel)
-        seasonView.addSubview(cloudnessLabel)
         seasonView.addSubview(conditionTextLabel)
         seasonView.addSubview(conditionLabel)
         
@@ -418,7 +425,7 @@ public class DetailsViewController: UIViewController {
             make.leading.equalTo(0)
             make.trailing.equalTo(0)
             make.top.equalTo(0)
-            make.height.equalTo(UIScreen.main.bounds.height / 4)
+            make.height.equalTo(UIScreen.main.bounds.height / 2)
         }
         
         bigView.snp.makeConstraints { make in
@@ -433,72 +440,77 @@ public class DetailsViewController: UIViewController {
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.top.equalToSuperview()
-            make.height.equalTo(UIScreen.main.bounds.height / 5.2)
+            make.height.equalTo(UIScreen.main.bounds.height / 6)
         }
         
-        
-        nameCityLabel.snp.makeConstraints { make in
-            make.leading.equalTo(12)
+        flagImageView.snp.makeConstraints { make in
+            make.leading.equalTo(8)
             make.top.equalTo(6)
+            make.height.equalTo(26)
+            make.width.equalTo(26)
+        }
+        nameCityLabel.snp.makeConstraints { make in
+            make.leading.equalTo(flagImageView.snp.trailing).offset(6)
+            make.top.equalTo(6)
+            make.height.equalTo(26)
+        }
+        isCapitalImageView.snp.makeConstraints { make in
+            make.leading.equalTo(nameCityLabel.snp.trailing).offset(6)
+            make.top.equalTo(6)
+            make.centerY.equalTo(nameCityLabel.snp.centerY)
         }
         
-        populationTextCityLabel.snp.makeConstraints { make in
-            make.top.equalTo(nameCityLabel.snp.bottom).offset(16)
-            make.leading.equalTo(12)
-        }
         
-        populationCityLabel.snp.makeConstraints { make in
-            make.top.equalTo(nameCityLabel.snp.bottom).offset(16)
-            make.leading.equalTo(populationTextCityLabel.snp.trailing).offset(4)
-        }
         
         // MARK: - seasonView.snp.makeConstraints
         seasonView.snp.makeConstraints { make in
-            make.top.equalTo(populationTextCityLabel.snp.bottom).offset(8)
+            make.top.equalTo(nameCityLabel.snp.bottom).offset(18)
             make.leading.equalToSuperview()
             make.trailing.equalTo(cityView.snp.centerX)
             make.bottom.equalToSuperview()
         }
-        seasonTextLabel.snp.makeConstraints { make in
+        populationTextCityLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
+            make.leading.equalToSuperview().offset(6)
+            make.trailing.equalTo(seasonView.snp.centerX).offset(-10)
+            make.height.equalTo(20)
+        }
+        populationCityLabel.snp.makeConstraints { make in
+            make.centerY.equalTo(populationTextCityLabel.snp.centerY)
+            make.leading.equalTo(seasonView.snp.centerX).offset(-2)
+            make.trailing.equalToSuperview()
+            make.height.equalTo(20)
+        }
+        seasonTextLabel.snp.makeConstraints { make in
+            make.top.equalTo(populationTextCityLabel.snp.bottom).offset(8)
             make.leading.equalToSuperview().offset(6)
             make.trailing.equalTo(seasonView.snp.centerX).offset(-10)
             make.height.equalTo(20)
         }
         seasonLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.leading.equalTo(seasonView.snp.centerX).offset(-2)
-            make.trailing.equalToSuperview()
-            make.height.equalTo(20)
-        }
-        cloudnessTextLabel.snp.makeConstraints { make in
-            make.top.equalTo(seasonTextLabel.snp.bottom).offset(4)
-            make.leading.equalToSuperview().offset(6)
-            make.trailing.equalTo(seasonView.snp.centerX).offset(-10)
-            make.height.equalTo(20)
-        }
-        cloudnessLabel.snp.makeConstraints { make in
-            make.top.equalTo(seasonTextLabel.snp.bottom).offset(4)
+            make.centerY.equalTo(seasonTextLabel.snp.centerY).offset(-1)
             make.leading.equalTo(seasonView.snp.centerX).offset(-2)
             make.trailing.equalToSuperview()
             make.height.equalTo(20)
         }
         conditionTextLabel.snp.makeConstraints { make in
-            make.top.equalTo(cloudnessTextLabel.snp.bottom).offset(4)
+            make.top.equalTo(seasonTextLabel.snp.bottom).offset(8)
             make.leading.equalToSuperview().offset(6)
             make.trailing.equalTo(seasonView.snp.centerX).offset(-10)
             make.height.equalTo(20)
         }
         conditionLabel.snp.makeConstraints { make in
-            make.top.equalTo(cloudnessTextLabel.snp.bottom).offset(4)
-            make.leading.equalTo(conditionTextLabel.snp.trailing).offset(-2)
+            make.centerY.equalTo(conditionTextLabel.snp.centerY).offset(-1)
+            make.leading.equalTo(seasonView.snp.centerX).offset(-2)
             make.trailing.equalToSuperview()
-            make.height.equalTo(40)
+            make.height.equalTo(30)
         }
+        
+        
         
         // MARK: - windView.snp.makeConstraints
         windView.snp.makeConstraints { make in
-            make.top.equalTo(populationTextCityLabel.snp.bottom).offset(8)
+            make.top.equalTo(nameCityLabel.snp.bottom).offset(18)
             make.leading.equalTo(cityView.snp.centerX).offset(-12)
             make.trailing.equalToSuperview()
             make.bottom.equalToSuperview()
@@ -506,49 +518,49 @@ public class DetailsViewController: UIViewController {
         windSpeedTextLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.leading.equalToSuperview().offset(6)
-            make.trailing.equalTo(windView.snp.centerX)
+            make.trailing.equalTo(windView.snp.centerX).offset(-2)
             make.height.equalTo(20)
         }
         windSpeedLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.leading.equalTo(windView.snp.centerX).offset(6)
-            make.trailing.equalToSuperview()
+            make.bottom.equalTo(windSpeedTextLabel.snp.bottom)
+            make.leading.equalTo(windView.snp.centerX).offset(2)
+            make.trailing.equalToSuperview().offset(-6)
             make.height.equalTo(20)
         }
         windGustTextLabel.snp.makeConstraints { make in
             make.top.equalTo(windSpeedTextLabel.snp.bottom).offset(4)
             make.leading.equalToSuperview().offset(6)
-            make.trailing.equalTo(windView.snp.centerX)
+            make.trailing.equalTo(windView.snp.centerX).offset(-2)
             make.height.equalTo(20)
         }
         windGustLabel.snp.makeConstraints { make in
-            make.top.equalTo(windSpeedTextLabel.snp.bottom).offset(4)
-            make.leading.equalTo(windView.snp.centerX).offset(6)
-            make.trailing.equalToSuperview()
+            make.bottom.equalTo(windGustTextLabel.snp.bottom)
+            make.leading.equalTo(windView.snp.centerX).offset(2)
+            make.trailing.equalToSuperview().offset(-6)
             make.height.equalTo(20)
         }
         windDirTextLabel.snp.makeConstraints { make in
             make.top.equalTo(windGustTextLabel.snp.bottom).offset(4)
             make.leading.equalToSuperview().offset(6)
-            make.trailing.equalTo(windView.snp.centerX)
+            make.trailing.equalTo(windView.snp.centerX).offset(-2)
             make.height.equalTo(20)
         }
         windDirLabel.snp.makeConstraints { make in
-            make.top.equalTo(windGustTextLabel.snp.bottom).offset(4)
-            make.leading.equalTo(windView.snp.centerX).offset(6)
-            make.trailing.equalToSuperview()
+            make.bottom.equalTo(windDirTextLabel.snp.bottom)
+            make.leading.equalTo(windView.snp.centerX).offset(2)
+            make.trailing.equalToSuperview().offset(-6)
             make.height.equalTo(20)
         }
         pressureMmTextLabel.snp.makeConstraints { make in
             make.top.equalTo(windDirTextLabel.snp.bottom).offset(4)
             make.leading.equalToSuperview().offset(6)
-            make.trailing.equalTo(windView.snp.centerX)
+            make.trailing.equalTo(windView.snp.centerX).offset(-2)
             make.height.equalTo(20)
         }
         pressureMmLabel.snp.makeConstraints { make in
-            make.top.equalTo(windDirTextLabel.snp.bottom).offset(4)
-            make.leading.equalTo(windView.snp.centerX).offset(6)
-            make.trailing.equalToSuperview()
+            make.bottom.equalTo(pressureMmTextLabel.snp.bottom)
+            make.leading.equalTo(windView.snp.centerX).offset(2)
+            make.trailing.equalToSuperview().offset(-6)
             make.height.equalTo(20)
         }
          
@@ -567,34 +579,7 @@ public class DetailsViewController: UIViewController {
             make.bottom.equalToSuperview()
             make.top.equalTo(collectionView.snp.bottom).offset(2)
         }
-        
-        
-        
-        //shimmerView.startAnimating()
     }
-    
-//    func settingNC() {
-//
-//        let button = UIButton(type: .system)
-//        let image = UIImage(systemName: "chevron.left",
-//                            withConfiguration: UIImage.SymbolConfiguration(pointSize: 35,
-//                                                                           weight: .semibold))
-//        button.layer.cornerRadius = 22
-//        button.clipsToBounds = false
-//        button.imageView?.tintColor = .blue
-//        button.setImage(image, for: .normal)
-//        button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
-//
-//        let barButton = UIBarButtonItem(customView: button)
-//        barButton.customView?.translatesAutoresizingMaskIntoConstraints = false
-//        barButton.customView?.snp.makeConstraints { make in
-//            make.height.equalTo(50.0)
-//            make.width.equalTo(50.0)
-//        }
-//
-//        self.navigationItem.leftBarButtonItem = barButton
-//        self.navigationItem.leftBarButtonItem?.isEnabled = true
-//    }
     
     @objc func backButtonTapped() {
         presenter.router.popVC()
@@ -602,7 +587,50 @@ public class DetailsViewController: UIViewController {
 }
 
 extension DetailsViewController: DetailsViewProtocol {
-    
+    func configureCityView() {
+        nameCityLabel.text = presenter.city.name
+        if presenter.city.isCapital {
+            isCapitalImageView.isHidden = false
+        }
+        if presenter.city.population == 0 {
+            populationTextCityLabel.isHidden = true
+            populationCityLabel.isHidden = true
+        } else {
+            populationTextCityLabel.isHidden = false
+            populationCityLabel.isHidden = false
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            guard let string = formatter.string(for: Int(presenter.city.population)) else { return }
+            populationCityLabel.text = string
+        }
+    }
+    func configureWeatherView() {
+        if let fact = presenter.weather?.fact {
+            if fact.season != nil {seasonLabel.text = fact.season!}
+            if fact.condition != nil {conditionLabel.text = fact.condition!}
+            if fact.windSpeed != nil {windSpeedLabel.text = "\(fact.windSpeed!) m/c"}
+            if fact.windGust != nil {windGustLabel.text =  "\(fact.windGust!) m/c"}
+            
+            var dir = ""
+            switch fact.windDir  {
+            case "nw": dir = "north-west"
+            case "n": dir = "north"
+            case "ne": dir = "northeast"
+            case "e": dir = "eastern"
+            case "se": dir = "south-eastern"
+            case "s": dir = "southern"
+            case "sw": dir = "southwest"
+            case "w": dir = "western"
+            case "c": dir = "windless"
+            case .none: dir = "windless"
+            case .some(_): dir = ""
+            }
+            windDirLabel.text = dir
+            
+            if fact.pressureMm != nil {pressureMmLabel.text = "\(Int(fact.pressureMm!)) mm"}
+        
+        }
+    }
 }
 
 // MARK: - UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
@@ -612,6 +640,9 @@ extension DetailsViewController: UICollectionViewDelegate, UICollectionViewDataS
         }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if presenter.weather?.forecasts?.count != nil {
+            return presenter.weather!.forecasts!.count
+        }
         return 7
     }
     
@@ -621,6 +652,12 @@ extension DetailsViewController: UICollectionViewDelegate, UICollectionViewDataS
         cell.layer.cornerRadius = 15.0
         cell.layer.borderWidth = 2.0
         cell.layer.borderColor = UIColor.gray.cgColor
+        if presenter.weather?.forecasts != nil {
+            let forecasts = presenter.weather?.forecasts?[indexPath.row]
+            if forecasts != nil {
+                cell.configureCell(weatherDay: forecasts!, heightOfCell: 100)
+            }
+        }
         
         return cell
     }

@@ -50,6 +50,7 @@ public final class City: NSManagedObject {
     @NSManaged var isCapital: Bool
     @NSManaged var latitude: Double
     @NSManaged var longitude: Double
+    @NSManaged var population: Double
 
     @NSManaged var country: Country
     @NSManaged var timeAndTemp: TimeAndTemp
@@ -142,6 +143,9 @@ func managedObjectModel() -> NSManagedObjectModel {
     longitudeAttr.name = "longitude"
     longitudeAttr.attributeType = .doubleAttributeType
     
+    let populationAttr = NSAttributeDescription()
+    populationAttr.name = "population"
+    populationAttr.attributeType = .doubleAttributeType
     
     // MARK: - TimeAndTempEntity
     
@@ -200,8 +204,7 @@ func managedObjectModel() -> NSManagedObjectModel {
                           isCapitalAttr,
                           latitudeAttr,
                           longitudeAttr,
-                          tempAttr,
-                          utcDiffAttr,
+                          populationAttr,
                           cityToCountry,
                           cityToTime]
     timeAndTempEnt.properties = [tempAttr, utcDiffAttr, timeToCity]

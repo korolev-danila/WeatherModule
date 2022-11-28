@@ -160,6 +160,7 @@ struct Forecasts: Decodable {
     var tempMin: Double?
     var tempMax: Double?
     var parts: Parts?
+    var svgStr: String?
     
     enum CodingKeys: String, CodingKey {
         case date, sunrise, sunset, parts

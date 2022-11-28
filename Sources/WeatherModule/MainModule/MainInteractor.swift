@@ -10,6 +10,7 @@ import Alamofire
 
 protocol MainInteractorProtocol: AnyObject {
     
+    
     func fetchFlagImg(isoA2: String, completion: @escaping (_ flagImg: Data ) -> ())
     func fetchWeaher(forCity city: City, completion: @escaping (_ weather: WeatherSimple ) -> ())
 }
