@@ -12,9 +12,7 @@ import WebKit
 
 class CollectionCell: UICollectionViewCell {
     
-  //  let vcWebDelegate = VCWebDelegate()
-    
-    lazy var webView: WKWebView = {
+    var webView: WKWebView = {
         let preferences = WKPreferences()
         preferences.javaScriptEnabled = false
         let configuration = WKWebViewConfiguration()
@@ -23,17 +21,25 @@ class CollectionCell: UICollectionViewCell {
         wv.scrollView.isScrollEnabled = false
         wv.translatesAutoresizingMaskIntoConstraints = false
         wv.contentMode = .center
+        wv.isOpaque = false
+        wv.isHidden = true
         wv.backgroundColor = .clear
-   //     wv.navigationDelegate = vcWebDelegate
+        
         return wv
     }()
     
-    lazy var iconActivityView: UIActivityIndicatorView = {
+    var iconActivityView: UIActivityIndicatorView = {
         let activity = UIActivityIndicatorView(style: .medium)
         activity.contentMode = .center
+        activity.backgroundColor = .clear
+        activity.isHidden = true
         
         return activity
     }()
+    
+    var vcWebDelegate: VCWebDelegate?
+    
+    
     
     private let dayOfTheWeekLabel: UILabel = {
         let label = UILabel()
@@ -148,9 +154,7 @@ class CollectionCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        setupViews()
-        iconActivityView.startAnimating()
+            setupViews()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -158,13 +162,18 @@ class CollectionCell: UICollectionViewCell {
     }
     
     func setupViews() {
+        
         self.backgroundColor = .white
-
+        
         self.addSubview(dateLabel)
         self.addSubview(dayOfTheWeekLabel)
         self.addSubview(tempView)
         self.addSubview(webView)
         self.addSubview(iconActivityView)
+        
+        self.vcWebDelegate = VCWebDelegate()
+        self.vcWebDelegate?.webView = webView
+        self.vcWebDelegate?.iconActivityView = iconActivityView
         
         tempView.addSubview(dayTextLabel)
         tempView.addSubview(dayTempLabel)
@@ -269,42 +278,51 @@ class CollectionCell: UICollectionViewCell {
         }
          
         if weatherDay.svgStr != nil {
-            webView.isHidden = true
+            vcWebDelegate?.setDelegate()
             // Так и не смог понять как без сторонних библиотек вставить нормально svg
             let svgNew = """
 <svg xmlns="http://www.w3.org/2000/svg" width="\(heightOfCell*2)" height="\(heightOfCell*2)" viewBox="0 2 28 28">
 """
             webView.loadHTMLString((svgNew + weatherDay.svgStr!), baseURL: nil)
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                self.webView.isHidden = false
-                self.iconActivityView.stopAnimating()
-            }
-            
 
-        } else {
-            webView.isHidden = true
-            iconActivityView.startAnimating()
         }
     }
 }
 
-//class VCWebDelegate: UIViewController, UIWebViewDelegate {
-//
-//    weak var cell: CollectionCell?
-//
-//    init() {
-//        super.init(nibName: nil, bundle: nil)
-//
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//
-//    public override func viewDidLoad() {
-//        super.viewDidLoad()
-//
-//    }
-//}
+class VCWebDelegate: UIViewController {
+    
+    weak var iconActivityView: UIActivityIndicatorView?
+    weak var webView: WKWebView?
+   
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        view.backgroundColor = .clear
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setDelegate() {
+        if webView != nil {
+            webView?.navigationDelegate = self
+        } else {
+            print("webView nil")
+        }
+    }
+}
+
+extension VCWebDelegate: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        self.iconActivityView?.isHidden = false
+        self.iconActivityView?.startAnimating()
+    }
+    
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            self.webView?.isHidden = false
+            self.iconActivityView?.stopAnimating()
+        }
+    }
+    
+}
 
