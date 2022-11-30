@@ -9,15 +9,11 @@ import Foundation
 import UIKit
 import SnapKit
 
-protocol SearchCellProtocol {
-    
-    func setupViews()
-}
 
-class SearchCell: UITableViewCell, SearchCellProtocol {
-     
+class SearchCell: UITableViewCell {
+    
     private let nameLabel: UILabel = {
-       let label = UILabel()
+        let label = UILabel()
         label.text = "Name label"
         label.font = UIFont.systemFont(ofSize: 20)
         label.adjustsFontSizeToFitWidth = true
@@ -31,7 +27,7 @@ class SearchCell: UITableViewCell, SearchCellProtocol {
     }()
     
     private let countryLabel: UILabel = {
-       let label = UILabel()
+        let label = UILabel()
         label.text = "Country label"
         label.font = UIFont.systemFont(ofSize: 20)
         label.adjustsFontSizeToFitWidth = true
@@ -59,7 +55,7 @@ class SearchCell: UITableViewCell, SearchCellProtocol {
         
         self.addSubview(nameLabel)
         self.addSubview(countryLabel)
-
+        
         nameLabel.snp.makeConstraints { make in
             make.leading.equalTo(12)
             make.trailing.equalTo(self.snp.centerX)
@@ -74,8 +70,8 @@ class SearchCell: UITableViewCell, SearchCellProtocol {
         }
     }
     
-    func configureCell(city: CitySearch) {
-        nameLabel.text = city.name
-        countryLabel.text = city.country
+    func configureCell(cityName: String, cityCountry: String) {
+        nameLabel.text = cityName
+        countryLabel.text = cityCountry
     }
 }

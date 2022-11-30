@@ -7,38 +7,31 @@
 
 import Foundation
 
-protocol DetailsPresenterProtocol: AnyObject {
-    var router: DetailsRouterProtocol { get }
-    var city: City { get set }
-    var weather: Weather? { get set }
-    
-    func start()
-}
 
-class DetailsPresenter {
+class DetailsPresenter: DetailsViewOutputProtocol {
     
-    weak var view: DetailsViewProtocol?
+    weak var view: DetailsViewInputProtocol?
     var router: DetailsRouterProtocol
-    var interactor: DetailsInteractorProtocol
+    var interactor: DetailsInteractorInputProtocol
     
     var city: City
     var weather: Weather? 
     
-    init(interactor: DetailsInteractorProtocol, router: DetailsRouterProtocol, city: City){
+    init(interactor: DetailsInteractorInputProtocol, router: DetailsRouterProtocol, city: City){
         self.interactor = interactor
         self.router = router
         self.city = city
         
-        self.interactor.fetchWeaher(forCity: city) { [weak self] weather in
-            self?.weather = weather
-            self?.view?.configureWeatherView()
-            self?.view?.collectionView.reloadData()
-            self?.updateIcon()
-        }
+//        self.interactor.fetchWeaher(forCity: city) { [weak self] weather in
+//            self?.weather = weather
+//            self?.view?.configureWeatherView()
+//            self?.view?.collectionView.reloadData()
+//            self?.updateIcon()
+//        }
     }
 }
 
-extension DetailsPresenter: DetailsPresenterProtocol {
+extension DetailsPresenter: DetailsInteractorOutputProtocol {
     func start() {
         view?.configureCityView()
     }

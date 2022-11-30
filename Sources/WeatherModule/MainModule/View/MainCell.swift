@@ -149,9 +149,9 @@ class MainCell: UITableViewCell {
         
     }
     
-    func configureCell(city: City, time: String, deleteIsHidden: Bool) {
-        nameLabel.text = city.name
-        tempLabel.text = "\(Int(city.timeAndTemp.temp))"
+    func configureCell(name: String, temp: String, time: String, deleteIsHidden: Bool) {
+        nameLabel.text = name
+        tempLabel.text = temp    
         timeLabel.text = time
         self.deleteIsHidden = deleteIsHidden
     }

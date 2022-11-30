@@ -6,18 +6,20 @@
 //
 import UIKit
 
+
+
 public class MainModulBuider {
     public static func build() -> UINavigationController {
-        let interctor = MainInteractor()
+        let interactor = MainInteractor()
         let router = MainRouter()
-        let presenter = MainPresenter(interactor: interctor, router: router)
+        let presenter = MainPresenter(interactor: interactor, router: router)
         let viewController = MainViewController(presenter: presenter)
         let navigationController = UINavigationController(rootViewController: viewController)
         presenter.view = viewController
-        interctor.presenter = presenter
+        interactor.presenter = presenter
         router.navigationController = navigationController
-        router.delegate = presenter
         
         return navigationController
     }
 }
+

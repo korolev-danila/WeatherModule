@@ -9,61 +9,29 @@ import Foundation
 import UIKit
 import SnapKit
 
-protocol DetailsViewProtocol: AnyObject {
+protocol DetailsViewInputProtocol: AnyObject {
     
     var collectionView: UICollectionView { get set }
-    
+        
     func configureCityView()
     func configureWeatherView()
 }
 
+protocol DetailsViewOutputProtocol {
+    
+    var router: DetailsRouterProtocol { get }
+    var city: City { get set }
+    var weather: Weather? { get set }
+        
+    func start()
+}
+
+
 public class DetailsViewController: UIViewController {
     
-    var presenter: DetailsPresenterProtocol!
+    let presenter: DetailsViewOutputProtocol
     
-  //  let shimmerView = ShimmerView()
-   // let viewS = UIView()
-    
-    /*
-     Optional(WeatherModule.Fact(temp: Optional(10.0), feelsLike: Optional(3.0), icon: Optional("bkn_n"), condition: Optional("cloudy"), windSpeed: Optional(7.0), windGust: Optional(4.8), windDir: Optional("e"), pressureMm: Optional(764.0), pressurePa: Optional(1018.0), humidity: Optional(44.0), daytime: Optional("n"), polar: Optional(false), season: Optional("autumn"), precType: Optional(0.0), precStrength: Optional(0.0), isThunder: Optional(false), cloudness: Optional(0.5), obsTime: Optional(1669561200.0), phenomIcon: nil, phenomCondition: nil))
-     
-     windSpeed
-     windGust
-     windDir
-     pressureMm
-     
-     
-     cloudness enum
-     0 — ясно.
-     0.25 — малооблачно.
-     0.5 — облачно с прояснениями.
-     0.75 — облачно с прояснениями.
-     1 — пасмурно.
-     
-     condition enum
-     clear — ясно.
-     partly-cloudy — малооблачно.
-     cloudy — облачно с прояснениями.
-     overcast — пасмурно.
-     drizzle — морось.
-     light-rain — небольшой дождь.
-     rain — дождь.
-     moderate-rain — умеренно сильный дождь.
-     heavy-rain — сильный дождь.
-     continuous-heavy-rain — длительный сильный дождь.
-     showers — ливень.
-     wet-snow — дождь со снегом.
-     light-snow — небольшой снег.
-     snow — снег.
-     snow-showers — снегопад.
-     hail — град.
-     thunderstorm — гроза.
-     thunderstorm-with-rain — дождь с грозой.
-     thunderstorm-with-hail — гроза с градом.
-     
-     
-     season
-     */
+
     
     let barButton: UIButton = {
         let button = UIButton(type: .system)
@@ -127,7 +95,7 @@ public class DetailsViewController: UIViewController {
         return imageView
     }()
     
-    let nameCityLabel: UILabel = {
+    var nameCityLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 22)
         label.adjustsFontSizeToFitWidth = true
@@ -152,7 +120,7 @@ public class DetailsViewController: UIViewController {
         return imageView
     }()
     
-    let populationTextCityLabel: UILabel = {
+    var populationTextCityLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
        // label.font = UIFont.systemFont(ofSize: 20)
@@ -362,7 +330,7 @@ public class DetailsViewController: UIViewController {
     }()
     
     
-    init(presenter: DetailsPresenterProtocol) {
+    init(presenter: DetailsViewOutputProtocol) {
         self.presenter = presenter
         
         super.init(nibName: nil, bundle: nil)
@@ -376,7 +344,8 @@ public class DetailsViewController: UIViewController {
         super.viewDidLoad()
        
         initialize()
-        presenter.start()
+        startShimmeringEffect()
+     //   presenter.start()
     }
     
     func initialize() {
@@ -586,7 +555,14 @@ public class DetailsViewController: UIViewController {
     }
 }
 
-extension DetailsViewController: DetailsViewProtocol {
+// MARK: - DetailsViewInputProtocol
+extension DetailsViewController: DetailsViewInputProtocol {
+    func startShimmeringEffect() {
+      //  imageView.startShimmeringEffect()
+      //  nameCityLabel.startShimmeringEffect()
+      //  populationTextCityLabel.startShimmeringEffect()
+    }
+    
     func configureCityView() {
         nameCityLabel.text = presenter.city.name
         if presenter.city.isCapital {
@@ -662,3 +638,53 @@ extension DetailsViewController: UICollectionViewDelegate, UICollectionViewDataS
         return cell
     }
 }
+
+//extension UIView {
+//
+//
+//    func startShimmering() {
+//        id light = (id)[UIColor colorWithWhite:0 alpha:0.1].CGColor;
+//        id dark  = (id)[UIColor blackColor].CGColor;
+//
+//        CAGradientLayer *gradient = [CAGradientLayer layer];
+//        gradient.colors = @[dark, light, dark];
+//        gradient.frame = CGRectMake(-self.bounds.size.width, 0, 3*self.bounds.size.width, self.bounds.size.height);
+//        gradient.startPoint = CGPointMake(0.0, 0.5);
+//        gradient.endPoint   = CGPointMake(1.0, 0.525); // slightly slanted forward
+//        gradient.locations  = @[@0.4, @0.5, @0.6];
+//        self.layer.mask = gradient;
+//
+//        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"locations"];
+//        animation.fromValue = @[@0.0, @0.1, @0.2];
+//        animation.toValue   = @[@0.8, @0.9, @1.0];
+//
+//        animation.duration = 1.5;
+//        animation.repeatCount = HUGE_VALF;
+//        [gradient addAnimation:animation forKey:@"shimmer"];
+//    }
+    
+//    func startShimmeringEffect() {
+//        let light = UIColor.black.cgColor
+//        let alpha = UIColor(red: 206/255, green: 10/255, blue: 10/255, alpha: 0.7).cgColor
+//        let gradient = CAGradientLayer()
+//        gradient.frame = CGRect(x: -self.bounds.size.width,
+//                                y: 0, width: 3 * self.bounds.size.width,
+//                                height: self.bounds.size.height)
+//        gradient.colors = [light, alpha, light]
+//        gradient.startPoint = CGPoint(x: 0.0, y: 0.5)
+//        gradient.endPoint = CGPoint(x: 1.0,y: 0.525)
+//        gradient.locations = [0.35, 0.50, 0.65]
+//        self.layer.mask = gradient
+//
+//        let animation = CABasicAnimation(keyPath: "locations")
+//        animation.fromValue = [0.0, 0.1, 0.2]
+//        animation.toValue = [0.8, 0.9,1.0]
+//        animation.duration = 1.5
+//        animation.repeatCount = HUGE
+//        gradient.add(animation, forKey: "shimmer")
+//    }
+//
+//    func stopShimmeringEffect() {
+//            self.layer.mask = nil
+//        }
+//}

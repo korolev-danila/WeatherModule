@@ -14,14 +14,14 @@ protocol DetailsRouterProtocol: AnyObject {
 }
 
 class DetailsRouter: DetailsRouterProtocol {
-    weak var navigationController: UINavigationController!
+    weak var navigationController: UINavigationController?
     
     init(nc: UINavigationController) {
         self.navigationController = nc
     }
     
     func popVC() {
-        self.navigationController.popViewController(animated: true)
+        self.navigationController?.popViewController(animated: true)
     }
     
 }

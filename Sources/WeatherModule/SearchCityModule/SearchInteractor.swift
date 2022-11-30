@@ -6,38 +6,33 @@
 //
 
 import Foundation
-
 import Alamofire
 
-protocol SearchInteractorProtocol: AnyObject {
-    
-    var presenter: SearchPresenterProtocol? { get set }
-    
-    func fetchCitysArray(string: String, completion: @escaping (_ citys: [CitySearch]) -> ())
+
+protocol SearchInteractorInputProtocol {
+    func getCitysArray(forName string: String)
 }
 
-class SearchInteractor: SearchInteractorProtocol {
+protocol SearchInteractorOutputProtocol: AnyObject {
+    func showCitys(_ citys: [CitySearch])
+}
+
+class SearchInteractor: SearchInteractorInputProtocol {
+    weak var presenter: SearchInteractorOutputProtocol?
     
-    
-    weak var presenter: SearchPresenterProtocol?
-    
-    func fetchCitysArray(string: String, completion: @escaping (_ citys: [CitySearch])  -> ()) {
-        
+    func getCitysArray(forName string: String) {
         var citys = [CitySearch]()
-        
-        let url = "https://api.api-ninjas.com/v1/city?"
         
         let headers: HTTPHeaders = [
             "X-Api-Key": "68RDqAquE3kZPbNHiOWsOA==n1zofIERlsSHI2iB"
         ]
-        
         let parameters: Parameters = [
             "name" : string,
             "limit" : 30
         ]
         
-        guard let url = URL(string: url) else { return }
-        AF.request(url, parameters: parameters, headers: headers).responseData { response in
+        guard let url = URL(string: "https://api.api-ninjas.com/v1/city?") else { return }
+        AF.request(url, parameters: parameters, headers: headers).responseData { [weak self] response in
             switch response.result {
             case .success(let data):
                 do {
@@ -54,13 +49,12 @@ class SearchInteractor: SearchInteractorProtocol {
                                 }
                             }
                             citys.append(city)
-                            
                         } catch {
                             print(error)
                         }
                     }
                     
-                    completion(citys)
+                    self?.presenter?.showCitys(citys)
                 } catch {
                     print(error)
                 }

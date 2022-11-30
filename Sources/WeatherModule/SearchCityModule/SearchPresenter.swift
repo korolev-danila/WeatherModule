@@ -7,44 +7,51 @@
 
 import Foundation
 
-protocol SearchPresenterProtocol: AnyObject {
-    
-    var citys: [CitySearch] { get set }
-    
-    func save(_ index: IndexPath)
-    func fetchCitys(_ string: String)
-}
 
-class SearchPresenter {
+class SearchPresenter: SearchViewOutputProtocol {
     
-    weak var view: SearchViewProtocol?
-    var interactor: SearchInteractorProtocol
+    weak var view: SearchViewInputProtocol?
+    let interactor: SearchInteractorInputProtocol
+    unowned private var delegate: MainPresenterDelegate
     
-    weak var delegate: MainPresenterDelegate?
+    var citys = [CitySearch]() {
+        didSet {
+            view?.reloadTableView()
+        }
+    }
     
-    var citys = [CitySearch]()
-    
-    init(interactor: SearchInteractorProtocol, delegate: MainPresenterDelegate){
+    init(interactor: SearchInteractorInputProtocol, delegate: MainPresenterDelegate){
         self.interactor = interactor
         self.delegate = delegate
     }
-}
-
-extension SearchPresenter: SearchPresenterProtocol {
     
-    func save(_ index: IndexPath) {
-        delegate?.save(citys[index.row])
+    func citysCount() -> Int {
+        return citys.count
     }
     
-    func fetchCitys(_ string: String) {
+    func cityName(_ index: IndexPath) -> String {
+        return citys[index.row].name
+    }
+    
+    func countreName(_ index: IndexPath) -> String {
+        return citys[index.row].country
+    }
+    
+    func save(_ index: IndexPath) {
+        delegate.save(citys[index.row])
+    }
+    
+    func requestCities(_ string: String) {
         if !string.trimmingCharacters(in: .whitespaces).isEmpty {
-            view?.showActivityIndicator()
+            view?.startAnimation()
+            interactor.getCitysArray(forName: string)
         }
-        
-        interactor.fetchCitysArray(string: string) { [weak self] data in
-            self?.citys = data
-            self?.view?.hideActivityIndicator()
-            self?.view?.tableView.reloadData()
-        }
+    }
+}
+
+extension SearchPresenter: SearchInteractorOutputProtocol {
+    func showCitys(_ citys: [CitySearch]) {
+        self.citys = citys
+        view?.stopAnimation()
     }
 }

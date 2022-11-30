@@ -10,29 +10,52 @@ import Foundation
 import UIKit
 import SnapKit
 
-protocol SearchViewProtocol: AnyObject {
+protocol SearchViewInputProtocol: AnyObject {
     
-    var textField: UITextField { get set }
-    var tableView: UITableView { get set }
+    func reloadTableView()
+    func startAnimation()
+    func stopAnimation()
+}
+
+protocol SearchViewOutputProtocol {
     
-    func showActivityIndicator()
-    func hideActivityIndicator()
+    func citysCount() -> Int
+    func cityName(_ index: IndexPath) -> String
+    func countreName(_ index: IndexPath) -> String
+    func save(_ index: IndexPath)
+    func requestCities(_ string: String)
+    
 }
 
 public class SearchViewController: UIViewController {
     
-    var presenter: SearchPresenterProtocol!
+    let presenter: SearchViewOutputProtocol
     
     var search: String = ""
     
-    lazy var activityView: UIActivityIndicatorView = {
+    init(presenter: SearchViewOutputProtocol) {
+        self.presenter = presenter
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        initialize()
+    }
+    
+    private let activityView: UIActivityIndicatorView = {
         
         let act = UIActivityIndicatorView(style: .large)
         
         return act
     }()
     
-    lazy var textField: UITextField = {
+    private let textField: UITextField = {
         let tf = UITextField()
         tf.placeholder = "Search City"
         tf.font = UIFont.systemFont(ofSize: 20)
@@ -40,7 +63,6 @@ public class SearchViewController: UIViewController {
         tf.layer.borderWidth = 2.0
         tf.layer.borderColor = UIColor.gray.cgColor
         tf.translatesAutoresizingMaskIntoConstraints = false
-        tf.delegate = self
         tf.borderStyle = UITextField.BorderStyle.none
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: tf.frame.height))
         tf.leftView = paddingView
@@ -54,37 +76,19 @@ public class SearchViewController: UIViewController {
     }()
     
     
-    lazy var tableView: UITableView = {
+    private let tableView: UITableView = {
         let tv = UITableView()
         tv.translatesAutoresizingMaskIntoConstraints = false
-        tv.delegate = self
-        tv.dataSource = self
         tv.register(SearchCell.self, forCellReuseIdentifier: "cell")
         tv.keyboardDismissMode = .onDrag
-       // tv.sele
         
         return tv
     }()
     
-    init(presenter: SearchPresenterProtocol) {
-        self.presenter = presenter
-        
-        super.init(nibName: nil, bundle: nil)
-    }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        initialize()
-        textField.becomeFirstResponder()
-    }
 }
 
-extension SearchViewController: SearchViewProtocol {
+extension SearchViewController: SearchViewInputProtocol {
     
     private func initialize() {
         
@@ -93,6 +97,10 @@ extension SearchViewController: SearchViewProtocol {
         view.addSubview(textField)
         view.addSubview(tableView)
         view.addSubview(activityView)
+        
+        textField.delegate = self
+        tableView.delegate = self
+        tableView.dataSource = self
         
         activityView.snp.makeConstraints { make in
             make.centerX.equalTo(self.view.snp.centerX)
@@ -114,12 +122,15 @@ extension SearchViewController: SearchViewProtocol {
         }
     }
     
-    // MARK: - ActivityIndicator method
-    func showActivityIndicator() {
+    func reloadTableView() {
+        tableView.reloadData()
+    }
+    
+    func startAnimation() {
         activityView.startAnimating()
     }
     
-    func hideActivityIndicator(){
+    func stopAnimation() {
         activityView.stopAnimating()
     }
 }
@@ -131,31 +142,27 @@ extension SearchViewController: UITextFieldDelegate {
         if string.isEmpty {
             if let text = textField.text {
                 search = String(text.dropLast())
-            } else {
-                print("error if let text")
             }
         } else {
             if let text = textField.text {
                 search = text + string
-            } else {
-                print("error if let text")
             }
         }
         
-        presenter.fetchCitys(search)
+        presenter.requestCities(search)
         
         return true
     }
     
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-
+        
         textField.resignFirstResponder()
         return true
     }
-        
+    
     public func textFieldShouldClear(_ textField: UITextField) -> Bool {
         
-        hideActivityIndicator()
+        activityView.stopAnimating()
         search = ""
         return true
     }
@@ -178,14 +185,14 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return presenter.citys.count
+        return presenter.citysCount()
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath) as! SearchCell
-        let city = presenter.citys[indexPath.row]
         
-        cell.configureCell(city: city)
+        cell.configureCell(cityName: presenter.cityName(indexPath),
+                           cityCountry: presenter.countreName(indexPath))
         
         return cell
     }
