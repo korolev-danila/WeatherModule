@@ -58,7 +58,6 @@ class DetailsInteractor: DetailsInteractorInputProtocol {
     
     func getPhotoOfCity(name: String, completion: @escaping (_ image: Data ) -> ()) {
         
-        // AIzaSyDTlJhc1swSBU9L4mzVle_MO3qvse_NaSI
         
         // https://api.teleport.org/api/urban_areas/slug:amsterdam/images/
         
