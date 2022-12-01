@@ -7,51 +7,65 @@
 
 import Foundation
 
+struct SearchViewModel {
+    let name: String
+    let country: String
+}
 
-class SearchPresenter: SearchViewOutputProtocol {
+
+class SearchPresenter {
     
     weak var view: SearchViewInputProtocol?
     let interactor: SearchInteractorInputProtocol
     unowned private var delegate: MainPresenterDelegate
     
-    var citys = [CitySearch]() {
-        didSet {
-            view?.reloadTableView()
-        }
-    }
+    var citys: [CitySearch] = []
+    
+    var timer = Timer()
     
     init(interactor: SearchInteractorInputProtocol, delegate: MainPresenterDelegate){
         self.interactor = interactor
         self.delegate = delegate
+    }
+}
+
+
+// MARK: - SearchViewOutputProtocol
+extension SearchPresenter: SearchViewOutputProtocol {
+    
+    func viewModel(_ index: IndexPath) -> SearchViewModel {
+
+        return SearchViewModel(name: citys[safe: index.row]?.name ?? "",
+                               country: citys[safe: index.row]?.country ?? "")
     }
     
     func citysCount() -> Int {
         return citys.count
     }
     
-    func cityName(_ index: IndexPath) -> String {
-        return citys[index.row].name
-    }
-    
-    func countreName(_ index: IndexPath) -> String {
-        return citys[index.row].country
-    }
-    
     func save(_ index: IndexPath) {
-        delegate.save(citys[index.row])
+        if let city = citys[safe: index.row] {
+            delegate.save(city)
+        }
     }
     
     func requestCities(_ string: String) {
         if !string.trimmingCharacters(in: .whitespaces).isEmpty {
-            view?.startAnimation()
-            interactor.getCitysArray(forName: string)
-        }
+            timer.invalidate()
+            timer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false, block: { [weak self] _ in
+                self?.view?.startAnimation()
+                self?.interactor.getCitysArray(forName: string)
+            })
+        } 
     }
 }
 
+
+// MARK: - SearchInteractorOutputProtocol
 extension SearchPresenter: SearchInteractorOutputProtocol {
     func showCitys(_ citys: [CitySearch]) {
         self.citys = citys
+        view?.reloadTableView()
         view?.stopAnimation()
     }
 }

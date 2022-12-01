@@ -26,12 +26,7 @@ protocol MainInteractorOutputProtocol: AnyObject {
 class MainInteractor: MainInteractorInputProtocol {
     weak var presenter: MainInteractorOutputProtocol?
     
-    var countrys = [Country]() {
-        didSet {
-            print("didSet interator")
-            presenter?.updateCountrysArray(countrys)
-        }
-    }
+    var countrys: [Country] = []
     
     // MARK: - CoreData layer
     func fetchCountrys() {
@@ -40,6 +35,7 @@ class MainInteractor: MainInteractorInputProtocol {
         
         do {
             countrys = try context.fetch(fetchRequest)
+            presenter?.updateCountrysArray(countrys)
             print("countrys.count = \(countrys.count)")
         } catch let error as NSError {
             print(error.localizedDescription)
@@ -70,6 +66,7 @@ class MainInteractor: MainInteractorInputProtocol {
             try context.execute(deleteRequest)
             try context.save()
             countrys = [Country]()
+            fetchCountrys()
         } catch let error as NSError {
             print(error.localizedDescription)
         }
@@ -134,9 +131,8 @@ class MainInteractor: MainInteractorInputProtocol {
                 if country.citysArray.filter({ $0.name == citySearch.name }).first == nil {
                     
                     if let city = createCity(citySearch, country) {
-                        country.addToCitys(city)
                         try context.save()
-                        
+                        fetchCountrys()
                         DispatchQueue.main.async {
                             self.requestWeaher(forCity: city)
                         }
@@ -164,9 +160,9 @@ class MainInteractor: MainInteractorInputProtocol {
                 
                 
                 if let city = createCity(citySearch, country) {
-                    country.addToCitys(city)
+
                     try context.save()
-                    countrys.append(country)
+                    fetchCountrys()
                     
                     DispatchQueue.main.async {
                         self.requestWeaher(forCity: city)
@@ -184,6 +180,7 @@ class MainInteractor: MainInteractorInputProtocol {
         
         do {
             try context.save()
+
         } catch let error as NSError {
             print(error.localizedDescription)
         }

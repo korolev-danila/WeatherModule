@@ -40,6 +40,7 @@ class SearchCell: UITableViewCell {
         return label
     }()
     
+    // MARK: - init
     override init( style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init( style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
@@ -70,8 +71,9 @@ class SearchCell: UITableViewCell {
         }
     }
     
-    func configureCell(cityName: String, cityCountry: String) {
-        nameLabel.text = cityName
-        countryLabel.text = cityCountry
+    // MARK: - configureCell
+    func configureCell(_ viewModel: SearchViewModel) {
+        nameLabel.text = viewModel.name
+        countryLabel.text = viewModel.country
     }
 }

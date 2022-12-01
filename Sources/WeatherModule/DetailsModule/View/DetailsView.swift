@@ -10,28 +10,38 @@ import UIKit
 import SnapKit
 
 protocol DetailsViewInputProtocol: AnyObject {
-    
-    var collectionView: UICollectionView { get set }
-        
+            
+    func reloadCollection()
     func configureCityView()
     func configureWeatherView()
 }
 
 protocol DetailsViewOutputProtocol {
     
-    var router: DetailsRouterProtocol { get }
-    var city: City { get set }
-    var weather: Weather? { get set }
-        
-    func start()
+    func viewDidLoad()
+    func popVC()
+    func countryFlag() -> Data?
+    func cityName() -> String
+    func isCapital() -> Bool
+    func populationOfCity() -> String
+    func forecastCount() -> Int
+    
+    func factSeason() -> String
+    func factCondition() -> String
+    func factWindSpeed() -> String
+    func factWindGust() -> String
+    func factWindDir() -> String
+    func factPressureMm() -> String
+    
+    func updateCell(heightOfCell: Double,
+                    index: IndexPath) -> (dayTemp: String, nightTemp: String,
+                                          date: String, week: String, svgStr: String?)
 }
 
 
 public class DetailsViewController: UIViewController {
     
     let presenter: DetailsViewOutputProtocol
-    
-
     
     let barButton: UIButton = {
         let button = UIButton(type: .system)
@@ -84,8 +94,8 @@ public class DetailsViewController: UIViewController {
         let imageView = UIImageView()
         imageView.backgroundColor = .clear
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        if presenter.city.country.flagData != nil {
-            let img = UIImage(data: presenter.city.country.flagData!)
+        if let data = presenter.countryFlag() {
+            let img = UIImage(data: data)
             imageView.image = img?.resize(60)
         }
         imageView.contentMode = .scaleAspectFill
@@ -329,7 +339,7 @@ public class DetailsViewController: UIViewController {
         return view
     }()
     
-    
+    // MARK: - initialize & viewDidLoad
     init(presenter: DetailsViewOutputProtocol) {
         self.presenter = presenter
         
@@ -344,17 +354,12 @@ public class DetailsViewController: UIViewController {
         super.viewDidLoad()
        
         initialize()
-        startShimmeringEffect()
-     //   presenter.start()
+        presenter.viewDidLoad()
     }
     
     func initialize() {
-        print("initialize")
         view.backgroundColor = .white
         
-        // shimmerView.backgroundColor = .yellow
-       // shimmerView.translatesAutoresizingMaskIntoConstraints = false
-       // view.addSubview(shimmerView)
         view.addSubview(imageView)
         view.addSubview(bigView)
         
@@ -403,6 +408,8 @@ public class DetailsViewController: UIViewController {
             make.top.equalTo(imageView.snp.bottom).offset(-5)
             make.bottom.equalTo(0)
         }
+        
+        
         
         // MARK: - cityView.snp.makeConstraints
         cityView.snp.makeConstraints { make in
@@ -532,6 +539,8 @@ public class DetailsViewController: UIViewController {
             make.trailing.equalToSuperview().offset(-6)
             make.height.equalTo(20)
         }
+        
+        
          
         // MARK: - collectionView.snp.makeConstraints
         collectionView.snp.makeConstraints { make in
@@ -550,62 +559,40 @@ public class DetailsViewController: UIViewController {
         }
     }
     
+    // MARK: - Action popVC
     @objc func backButtonTapped() {
-        presenter.router.popVC()
+        presenter.popVC()
     }
 }
 
 // MARK: - DetailsViewInputProtocol
 extension DetailsViewController: DetailsViewInputProtocol {
-    func startShimmeringEffect() {
-      //  imageView.startShimmeringEffect()
-      //  nameCityLabel.startShimmeringEffect()
-      //  populationTextCityLabel.startShimmeringEffect()
-    }
     
+    func reloadCollection() {
+        collectionView.reloadData()
+    }
+
     func configureCityView() {
-        nameCityLabel.text = presenter.city.name
-        if presenter.city.isCapital {
+        nameCityLabel.text = presenter.cityName()
+        if presenter.isCapital() {
             isCapitalImageView.isHidden = false
         }
-        if presenter.city.population == 0 {
+        if presenter.populationOfCity() == "" {
             populationTextCityLabel.isHidden = true
             populationCityLabel.isHidden = true
         } else {
             populationTextCityLabel.isHidden = false
             populationCityLabel.isHidden = false
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            guard let string = formatter.string(for: Int(presenter.city.population)) else { return }
-            populationCityLabel.text = string
+            populationCityLabel.text = presenter.populationOfCity()
         }
     }
     func configureWeatherView() {
-        if let fact = presenter.weather?.fact {
-            if fact.season != nil {seasonLabel.text = fact.season!}
-            if fact.condition != nil {conditionLabel.text = fact.condition!}
-            if fact.windSpeed != nil {windSpeedLabel.text = "\(fact.windSpeed!) m/c"}
-            if fact.windGust != nil {windGustLabel.text =  "\(fact.windGust!) m/c"}
-            
-            var dir = ""
-            switch fact.windDir  {
-            case "nw": dir = "north-west"
-            case "n": dir = "north"
-            case "ne": dir = "northeast"
-            case "e": dir = "eastern"
-            case "se": dir = "south-eastern"
-            case "s": dir = "southern"
-            case "sw": dir = "southwest"
-            case "w": dir = "western"
-            case "c": dir = "windless"
-            case .none: dir = "windless"
-            case .some(_): dir = ""
-            }
-            windDirLabel.text = dir
-            
-            if fact.pressureMm != nil {pressureMmLabel.text = "\(Int(fact.pressureMm!)) mm"}
-        
-        }
+        seasonLabel.text = presenter.factSeason()
+        conditionLabel.text = presenter.factSeason()
+        windSpeedLabel.text =  presenter.factWindSpeed()
+        windGustLabel.text = presenter.factWindGust()
+        windDirLabel.text = presenter.factWindDir()
+        pressureMmLabel.text = presenter.factPressureMm()
     }
 }
 
@@ -616,10 +603,8 @@ extension DetailsViewController: UICollectionViewDelegate, UICollectionViewDataS
         }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if presenter.weather?.forecasts?.count != nil {
-            return presenter.weather!.forecasts!.count
-        }
-        return 7
+        
+        return presenter.forecastCount()
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -628,63 +613,11 @@ extension DetailsViewController: UICollectionViewDelegate, UICollectionViewDataS
         cell.layer.cornerRadius = 15.0
         cell.layer.borderWidth = 2.0
         cell.layer.borderColor = UIColor.gray.cgColor
-        if presenter.weather?.forecasts != nil {
-            let forecasts = presenter.weather?.forecasts?[indexPath.row]
-            if forecasts != nil {
-                cell.configureCell(weatherDay: forecasts!, heightOfCell: 100)
-            }
-        }
+
+        let update = presenter.updateCell(heightOfCell: 100, index: indexPath)
+        cell.configureCell(dayTemp: update.dayTemp, nightTemp: update.nightTemp,
+                           date: update.date, week: update.week, svgStr: update.svgStr)
         
         return cell
     }
 }
-
-//extension UIView {
-//
-//
-//    func startShimmering() {
-//        id light = (id)[UIColor colorWithWhite:0 alpha:0.1].CGColor;
-//        id dark  = (id)[UIColor blackColor].CGColor;
-//
-//        CAGradientLayer *gradient = [CAGradientLayer layer];
-//        gradient.colors = @[dark, light, dark];
-//        gradient.frame = CGRectMake(-self.bounds.size.width, 0, 3*self.bounds.size.width, self.bounds.size.height);
-//        gradient.startPoint = CGPointMake(0.0, 0.5);
-//        gradient.endPoint   = CGPointMake(1.0, 0.525); // slightly slanted forward
-//        gradient.locations  = @[@0.4, @0.5, @0.6];
-//        self.layer.mask = gradient;
-//
-//        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"locations"];
-//        animation.fromValue = @[@0.0, @0.1, @0.2];
-//        animation.toValue   = @[@0.8, @0.9, @1.0];
-//
-//        animation.duration = 1.5;
-//        animation.repeatCount = HUGE_VALF;
-//        [gradient addAnimation:animation forKey:@"shimmer"];
-//    }
-    
-//    func startShimmeringEffect() {
-//        let light = UIColor.black.cgColor
-//        let alpha = UIColor(red: 206/255, green: 10/255, blue: 10/255, alpha: 0.7).cgColor
-//        let gradient = CAGradientLayer()
-//        gradient.frame = CGRect(x: -self.bounds.size.width,
-//                                y: 0, width: 3 * self.bounds.size.width,
-//                                height: self.bounds.size.height)
-//        gradient.colors = [light, alpha, light]
-//        gradient.startPoint = CGPoint(x: 0.0, y: 0.5)
-//        gradient.endPoint = CGPoint(x: 1.0,y: 0.525)
-//        gradient.locations = [0.35, 0.50, 0.65]
-//        self.layer.mask = gradient
-//
-//        let animation = CABasicAnimation(keyPath: "locations")
-//        animation.fromValue = [0.0, 0.1, 0.2]
-//        animation.toValue = [0.8, 0.9,1.0]
-//        animation.duration = 1.5
-//        animation.repeatCount = HUGE
-//        gradient.add(animation, forKey: "shimmer")
-//    }
-//
-//    func stopShimmeringEffect() {
-//            self.layer.mask = nil
-//        }
-//}

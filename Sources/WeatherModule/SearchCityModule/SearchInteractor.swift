@@ -17,11 +17,15 @@ protocol SearchInteractorOutputProtocol: AnyObject {
     func showCitys(_ citys: [CitySearch])
 }
 
-class SearchInteractor: SearchInteractorInputProtocol {
+class SearchInteractor {
+    
     weak var presenter: SearchInteractorOutputProtocol?
+}
+
+extension SearchInteractor: SearchInteractorInputProtocol {
     
     func getCitysArray(forName string: String) {
-        var citys = [CitySearch]()
+        var citys: [CitySearch] = []
         
         let headers: HTTPHeaders = [
             "X-Api-Key": "68RDqAquE3kZPbNHiOWsOA==n1zofIERlsSHI2iB"
@@ -36,6 +40,7 @@ class SearchInteractor: SearchInteractorInputProtocol {
             switch response.result {
             case .success(let data):
                 do {
+                    print(data)
                     guard let jsonArray = try JSONSerialization.jsonObject(with: data, options : .allowFragments) as? [Dictionary<String,Any>] else { return }
                     for dictionary in jsonArray {
                         do {
@@ -53,7 +58,7 @@ class SearchInteractor: SearchInteractorInputProtocol {
                             print(error)
                         }
                     }
-                    
+                    print("show citys")
                     self?.presenter?.showCitys(citys)
                 } catch {
                     print(error)

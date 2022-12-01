@@ -22,6 +22,5 @@ class DetailsRouter: DetailsRouterProtocol {
     
     func popVC() {
         self.navigationController?.popViewController(animated: true)
-    }
-    
+    }    
 }

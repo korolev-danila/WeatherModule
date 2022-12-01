@@ -15,12 +15,12 @@ protocol MainViewInputProtocol: AnyObject {
 
 protocol MainViewOutputProtocol {
     
-    func start()
+    func viewDidLoad()
     
     func countrysCount() -> Int
     func sectionArrayCount(_ section: Int) -> Int
-    func countryName(_ section: Int) -> String
-    func countryFlag(_ section: Int) -> Data?
+    
+    func headerCell(_ section: Int) -> HeaderCellViewModel
     
     func didTapButton()
     func showDetails(index: IndexPath)
@@ -29,31 +29,12 @@ protocol MainViewOutputProtocol {
     func updateName(for index: IndexPath) -> String
     func updateTemp(for index: IndexPath) -> String
     func updateTime(for index: IndexPath) -> String
-    func updateFlag(forSection section: Int )
+    //   func updateFlag(forSection section: Int )
 }
 
 public class MainViewController: UIViewController {
     
     let presenter: MainViewOutputProtocol
-    
-    // MARK: - Initialize Method
-    init(presenter: MainViewOutputProtocol) {
-        self.presenter = presenter
-        
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        presenter.start()
-        initialize()
-        settingNC()
-    }
     
     private var deleteIsHidden = true {
         didSet {
@@ -88,6 +69,53 @@ public class MainViewController: UIViewController {
         return tv
     }()
     
+    // MARK: - Initialize Method
+    init(presenter: MainViewOutputProtocol) {
+        self.presenter = presenter
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        initialize()
+        settingNC()
+        presenter.viewDidLoad()
+    }
+    
+    private func initialize() {
+        
+        view.backgroundColor = .white
+        
+        view.addSubview(tableView)
+        view.addSubview(searchButton)
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+        
+        searchButton.snp.makeConstraints { make in
+            make.bottom.equalToSuperview().inset(80.0)
+            make.trailing.equalToSuperview().inset(55.0)
+            make.height.equalTo(50.0)
+            make.width.equalTo(50.0)
+        }
+        
+        tableView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(70)
+            make.bottom.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+        }
+    }
+    
+    
+    
+    // MARK: - NavigationBar UI&Method
     func settingNC() {
         self.navigationController?.navigationBar.topItem?.title = "Weather App"
         setEditButton()
@@ -130,35 +158,11 @@ public class MainViewController: UIViewController {
     }
 }
 
+// MARK: - MainViewInputProtocol
 extension MainViewController: MainViewInputProtocol {
     
     func reloadTableView() {
         tableView.reloadData()
-    }
-    
-    private func initialize() {
-        
-        view.backgroundColor = .white
-        
-        view.addSubview(tableView)
-        view.addSubview(searchButton)
-        
-        tableView.delegate = self
-        tableView.dataSource = self
-        
-        searchButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().inset(80.0)
-            make.trailing.equalToSuperview().inset(55.0)
-            make.height.equalTo(50.0)
-            make.width.equalTo(50.0)
-        }
-        
-        tableView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(70)
-            make.bottom.equalToSuperview()
-            make.leading.equalToSuperview()
-            make.trailing.equalToSuperview()
-        }
     }
 }
 
@@ -199,31 +203,11 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     // MARK: - Headers Method&UI
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         
-        let headerView = HeaderView()
+        let headerView = HeaderView(frame: CGRect.init(x: 0, y: 0,
+                                                       width: tableView.frame.width,
+                                                       height: 60))
         
-        headerView.frame = CGRect.init(x: 0, y: 0,
-                                       width: tableView.frame.width,
-                                       height: 50)
-        headerView.initialize()
-        
-        headerView.headerLabel.text = presenter.countryName(section)
-        
-        let imgData = presenter.countryFlag(section)
-        
-        if imgData != nil {
-            if UIImage(data: imgData!) != nil {
-                headerView.activityView.stopAnimating()
-                headerView.imageView.image = UIImage(data: imgData!)!.resize(60)
-            } else {
-                presenter.updateFlag(forSection: section)
-                headerView.activityView.startAnimating()
-            }
-        } else {
-            if !headerView.activityView.isAnimating {
-                headerView.activityView.startAnimating()
-                presenter.updateFlag(forSection: section)
-            }
-        }
+        headerView.settingCell(presenter.headerCell(section))
         
         return headerView
     }
@@ -242,6 +226,7 @@ extension MainViewController: MainViewCellDelegate {
     }
 }
 
+// MARK: - UIImage resize
 extension UIImage {
     func resize(_ max_size: CGFloat) -> UIImage {
         let max_size_pixels = max_size / UIScreen.main.scale

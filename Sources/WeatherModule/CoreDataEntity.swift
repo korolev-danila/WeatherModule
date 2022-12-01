@@ -17,7 +17,6 @@ public final class Country: NSManagedObject {
     public var citysArray: [City] {
         let set = citys as? Set<City> ?? []
         
-        
         return set.sorted {
             $0.name < $1.name
         }.sorted {
@@ -75,6 +74,16 @@ extension TimeAndTemp: Identifiable {
     }
 }
 
+public final class SvgImg: NSManagedObject {
+    @NSManaged var iconName: String
+    @NSManaged var svg: String
+}
+
+extension SvgImg: Identifiable {
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<SvgImg> {
+        return NSFetchRequest<SvgImg>(entityName: "SvgImg")
+    }
+}
 
 // MARK: - Persistent Container
 var persistentContainer: NSPersistentContainer = {
@@ -163,6 +172,21 @@ func managedObjectModel() -> NSManagedObjectModel {
     utcDiffAttr.name = "utcDiff"
     utcDiffAttr.attributeType = .doubleAttributeType
     
+    // MARK: - SvgImgEntity
+    
+    let svgImgEnt = NSEntityDescription()
+    svgImgEnt.name = "SvgImg"
+    svgImgEnt.managedObjectClassName = NSStringFromClass(SvgImg.self)
+    
+    // Attributes
+    
+    let iconNameAttr = NSAttributeDescription()
+    iconNameAttr.name = "iconName"
+    iconNameAttr.attributeType = .stringAttributeType
+    
+    let svgAttr = NSAttributeDescription()
+    svgAttr.name = "svg"
+    svgAttr.attributeType = .stringAttributeType
     
     // MARK: - Relationships
     
@@ -208,9 +232,10 @@ func managedObjectModel() -> NSManagedObjectModel {
                           cityToCountry,
                           cityToTime]
     timeAndTempEnt.properties = [tempAttr, utcDiffAttr, timeToCity]
+    svgImgEnt.properties = [iconNameAttr, svgAttr]
     
     
-    model.entities = [countryEnt,cityEnt,timeAndTempEnt]
+    model.entities = [countryEnt, cityEnt, timeAndTempEnt, svgImgEnt]
     
     return model
 }

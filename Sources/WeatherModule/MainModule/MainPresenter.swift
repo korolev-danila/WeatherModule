@@ -7,18 +7,22 @@
 
 import Foundation
 
+struct HeaderCellViewModel {
+    let name: String
+    let imgData: Data
+}
 
 protocol MainPresenterDelegate: AnyObject  {
     func save(_ citySearch: CitySearch)
 }
 
-class MainPresenter: MainViewOutputProtocol {
+class MainPresenter {
     
     weak var view: MainViewInputProtocol?
     let router: MainRouterProtocol
     let interactor: MainInteractorInputProtocol
     
-    var countrys = [Country]() {
+    var countrys: [Country] = [] {
         didSet {
             view?.reloadTableView()
         }
@@ -30,22 +34,7 @@ class MainPresenter: MainViewOutputProtocol {
         self.interactor = interactor
         self.router = router
     }
-    
-    
-    func start() {
-        interactor.fetchCountrys()
-        startTimer()
-        updateAllTemp()
-    }
-    
-    // MARK: - Router Method
-    func didTapButton() {
-        router.pushSearchView(delegate: self)
-    }
-    
-    func showDetails(index: IndexPath) {
-        router.pushDetailsView(city: countrys[index.section].citysArray[index.row])
-    }
+  
     
     // MARK: - Update properties
     func startTimer() {
@@ -77,6 +66,40 @@ class MainPresenter: MainViewOutputProtocol {
             }
         }
     }
+}
+
+
+
+// MARK: - MainViewOutputProtocol
+extension MainPresenter: MainViewOutputProtocol {
+    
+    func viewDidLoad() {
+        interactor.fetchCountrys()
+        startTimer()
+        updateAllTemp()
+    }
+    
+
+    
+    // MARK: - Router Method
+    func didTapButton() {
+        router.pushSearchView(delegate: self)
+    }
+    
+    func showDetails(index: IndexPath) {
+        router.pushDetailsView(city: countrys[index.section].citysArray[index.row])
+    }
+    
+    func deleteCity(for index: IndexPath) {
+        interactor.deleteCity(countrys[index.section].citysArray[index.row])
+    }
+    
+    func deleteAll() {
+        countrys = []
+        interactor.resetAllRecords()
+    }
+
+
     
     // MARK: - UI Update
     func countrysCount() -> Int {
@@ -87,13 +110,24 @@ class MainPresenter: MainViewOutputProtocol {
         return countrys[section].citysArray.count
     }
     
-    func countryName(_ section: Int) -> String {
-        return countrys[section].name
+    func headerCell(_ section: Int) -> HeaderCellViewModel {
+        
+        var data = Data()
+        
+        if let flagData = countrys[safe: section]?.flagData {
+            data = flagData
+        } else {
+            if let country = countrys[safe: section] {
+                DispatchQueue.main.async {
+                    self.interactor.requestFlagImg(country: country)
+                }
+            }
+        }
+        
+        return HeaderCellViewModel(name: countrys[safe: section]?.name ?? "",
+                                   imgData: data)
     }
     
-    func countryFlag(_ section: Int) -> Data? {
-        return countrys[section].flagData
-    }
     
     func updateName(for index: IndexPath) -> String {
         return countrys[index.section].citysArray[index.row].name
@@ -114,22 +148,14 @@ class MainPresenter: MainViewOutputProtocol {
         return timeString
     }
     
-    func updateFlag(forSection section: Int) {
-        DispatchQueue.main.async {
-            self.interactor.requestFlagImg(country: self.countrys[section])
-        }
-    }
-    
-    func deleteCity(for index: IndexPath) {
-        interactor.deleteCity(countrys[index.section].citysArray[index.row])
-    }
-    
-    func deleteAll() {
-        countrys = [Country]()
-        interactor.resetAllRecords()
-    }
+//    func updateFlag(forSection section: Int) {
+//        DispatchQueue.main.async {
+//            self.interactor.requestFlagImg(country: self.countrys[section])
+//        }
+//    }
 }
 
+// MARK: - MainInteractorOutputProtocol
 extension MainPresenter: MainInteractorOutputProtocol {
     
     func updateCountrysArray(_ array: [Country]) {
@@ -142,5 +168,13 @@ extension MainPresenter: MainPresenterDelegate {
     
     func save(_ citySearch: CitySearch) {
         interactor.save(citySearch)
+    }
+}
+
+// MARK: - Collection safe index
+extension Collection {
+    /// Returns the element at the specified index if it is within bounds, otherwise nil.
+    subscript (safe index: Index) -> Element? {
+        return indices.contains(index) ? self[index] : nil
     }
 }

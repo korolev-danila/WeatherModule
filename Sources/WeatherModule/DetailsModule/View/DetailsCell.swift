@@ -152,6 +152,7 @@ class CollectionCell: UICollectionViewCell {
         return label
     }()
     
+    // MARK: - init
     override init(frame: CGRect) {
         super.init(frame: frame)
             setupViews()
@@ -256,39 +257,23 @@ class CollectionCell: UICollectionViewCell {
         }
     }
     
-    func configureCell(weatherDay: Forecasts, heightOfCell: Double) {
-        if weatherDay.parts?.dayShort?.temp != nil { dayTempLabel.text = "\(Int(weatherDay.parts?.dayShort?.temp! ?? 0))" }
-        if weatherDay.parts?.nightShort?.temp != nil {nightTempLabel.text = "\(Int(weatherDay.parts?.nightShort?.temp! ?? 0))"}
+    // MARK: - configureCell
+    func configureCell(dayTemp: String, nightTemp: String,
+                        date: String, week: String, svgStr: String?) {
         
-        if weatherDay.date != nil {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd"
-            dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-            let date = dateFormatter.date(from: weatherDay.date!)
-            
-            if date != nil {
-                dateFormatter.dateFormat = "dd.MM"
-                let dateStr = dateFormatter.string(from: date!)
-                dateFormatter.dateFormat = "EEEE"
-                let dayOfWeek = dateFormatter.string(from: date!)
-                
-                dateLabel.text = dateStr
-                dayOfTheWeekLabel.text = dayOfWeek
-            }
-        }
-         
-        if weatherDay.svgStr != nil {
+        dayTempLabel.text = dayTemp
+        nightTempLabel.text = nightTemp
+        dateLabel.text = date
+        dayOfTheWeekLabel.text = week
+        
+        if svgStr != nil {
             vcWebDelegate?.setDelegate()
-            // Так и не смог понять как без сторонних библиотек вставить нормально svg
-            let svgNew = """
-<svg xmlns="http://www.w3.org/2000/svg" width="\(heightOfCell*2)" height="\(heightOfCell*2)" viewBox="0 2 28 28">
-"""
-            webView.loadHTMLString((svgNew + weatherDay.svgStr!), baseURL: nil)
-
+            webView.loadHTMLString(svgStr!, baseURL: nil)
         }
     }
 }
 
+// MARK: - VCWebDelegate
 class VCWebDelegate: UIViewController {
     
     weak var iconActivityView: UIActivityIndicatorView?
@@ -311,6 +296,7 @@ class VCWebDelegate: UIViewController {
     }
 }
 
+// MARK: - WKNavigationDelegate
 extension VCWebDelegate: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         self.iconActivityView?.isHidden = false

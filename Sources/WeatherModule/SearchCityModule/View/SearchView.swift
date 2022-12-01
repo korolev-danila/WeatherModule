@@ -20,8 +20,7 @@ protocol SearchViewInputProtocol: AnyObject {
 protocol SearchViewOutputProtocol {
     
     func citysCount() -> Int
-    func cityName(_ index: IndexPath) -> String
-    func countreName(_ index: IndexPath) -> String
+    func viewModel(_ index: IndexPath) -> SearchViewModel
     func save(_ index: IndexPath)
     func requestCities(_ string: String)
     
@@ -32,21 +31,6 @@ public class SearchViewController: UIViewController {
     let presenter: SearchViewOutputProtocol
     
     var search: String = ""
-    
-    init(presenter: SearchViewOutputProtocol) {
-        self.presenter = presenter
-        
-        super.init(nibName: nil, bundle: nil)
-    }
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        initialize()
-    }
     
     private let activityView: UIActivityIndicatorView = {
         
@@ -85,10 +69,22 @@ public class SearchViewController: UIViewController {
         return tv
     }()
     
+    // MARK: - Initialize & viewDidLoad
+    init(presenter: SearchViewOutputProtocol) {
+        self.presenter = presenter
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-}
-
-extension SearchViewController: SearchViewInputProtocol {
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        initialize()
+        textField.becomeFirstResponder()
+    }
     
     private func initialize() {
         
@@ -121,6 +117,11 @@ extension SearchViewController: SearchViewInputProtocol {
             make.trailing.equalTo(view.snp_trailingMargin)
         }
     }
+}
+
+
+// MARK: - SearchViewInputProtocol
+extension SearchViewController: SearchViewInputProtocol {
     
     func reloadTableView() {
         tableView.reloadData()
@@ -135,10 +136,12 @@ extension SearchViewController: SearchViewInputProtocol {
     }
 }
 
+
 // MARK: - TextField Delegate
 extension SearchViewController: UITextFieldDelegate {
     
     public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    
         if string.isEmpty {
             if let text = textField.text {
                 search = String(text.dropLast())
@@ -154,12 +157,6 @@ extension SearchViewController: UITextFieldDelegate {
         return true
     }
     
-    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        
-        textField.resignFirstResponder()
-        return true
-    }
-    
     public func textFieldShouldClear(_ textField: UITextField) -> Bool {
         
         activityView.stopAnimating()
@@ -167,6 +164,7 @@ extension SearchViewController: UITextFieldDelegate {
         return true
     }
 }
+
 
 // MARK: - TableViewController Delegate
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
@@ -191,8 +189,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath) as! SearchCell
         
-        cell.configureCell(cityName: presenter.cityName(indexPath),
-                           cityCountry: presenter.countreName(indexPath))
+        cell.configureCell( presenter.viewModel(indexPath))
         
         return cell
     }

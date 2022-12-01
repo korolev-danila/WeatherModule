@@ -7,12 +7,12 @@
 
 import Foundation
 import UIKit
-import SnapKit
 
 class HeaderView: UIView {
     
-    let headerLabel: UILabel = {
+    private let headerLabel: UILabel = {
         let label = UILabel()
+        label.backgroundColor = .clear
         label.font = .systemFont(ofSize: 12)
         label.font = UIFont.preferredFont(forTextStyle: .title3)
         label.textColor = .black
@@ -20,17 +20,17 @@ class HeaderView: UIView {
         return label
     }()
     
-    let activityView: UIActivityIndicatorView = {
+    private let activityView: UIActivityIndicatorView = {
         let activity = UIActivityIndicatorView(style: .medium)
         activity.contentMode = .center
         
         return activity
     }()
     
-    let imageView: UIImageView = {
+    private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .clear
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+//        imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 13
@@ -38,7 +38,19 @@ class HeaderView: UIView {
         return imageView
     }()
     
-    func initialize() {
+    
+    // MARK: - init
+    override init( frame: CGRect) {
+        super.init(frame: frame)
+        
+        setupViews(frame.size.height)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupViews(_ heightOfCell: CGFloat) {
         
         self.backgroundColor = UIColor.gray
         self.layer.cornerRadius = 15.0
@@ -49,25 +61,28 @@ class HeaderView: UIView {
         self.addSubview(imageView)
         self.addSubview(headerLabel)
         
-        imageView.snp.makeConstraints { make in
-            make.centerY.equalTo(self.snp.centerY)
-            make.leading.equalTo(2)
-            make.height.equalTo(-4)
-            make.width.equalTo(26)
-        }
+        activityView.frame = CGRect(x: 1, y: 1,
+                                    width: heightOfCell / 2 - 2,
+                                    height: heightOfCell / 2 - 2)
 
-        headerLabel.snp.makeConstraints { make in
-            make.leading.equalTo(imageView.snp.trailing).offset(2)
-            make.bottom.equalTo(-2)
-            make.height.equalTo(-4)
-            make.trailing.equalTo(-12)
-        }
+        imageView.frame = CGRect(x: 1, y: 1,
+                                 width: heightOfCell / 2 - 2,
+                                 height: heightOfCell / 2 - 2)
 
-        activityView.snp.makeConstraints { make in
-            make.centerY.equalTo(self.snp.centerY)
-            make.left.equalTo(2)
-            make.height.equalTo(-4)
-            make.width.equalTo(26)
+        headerLabel.frame = CGRect(x: heightOfCell / 2, y: 0,
+                                   width: self.frame.width - heightOfCell*1.25,
+                                   height: heightOfCell  / 2)
+    }
+    
+    public func settingCell(_ viewModel: HeaderCellViewModel) {
+        
+        headerLabel.text = viewModel.name
+        
+        if let image = UIImage(data: viewModel.imgData)  {
+            activityView.stopAnimating()
+            imageView.image = image.resize(60)
+        } else {
+            activityView.startAnimating()
         }
     }
 }
