@@ -13,22 +13,55 @@ protocol MainInteractorInputProtocol {
     
     func fetchCountrys()
     func resetAllRecords()
+    func deleteCity(_ city: City)
+    func save(_ citySearch: CitySearch)
     func requestFlagImg(country: Country)
     func requestWeaher(forCity city: City)
-    func save(_ citySearch: CitySearch)
-    func deleteCity(_ city: City)
 }
 
 protocol MainInteractorOutputProtocol: AnyObject {
     func updateCountrysArray(_ array: [Country])
 }
 
-class MainInteractor: MainInteractorInputProtocol {
+class MainInteractor {
     weak var presenter: MainInteractorOutputProtocol?
     
     var countrys: [Country] = []
     
-    // MARK: - CoreData layer
+    private func updateImg(image: Data, in country: Country) {
+
+        country.flagData = image
+        
+        do {
+            try context.save()
+            fetchCountrys()
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func updateWeather(with weather: WeatherSimple, in city: City) {
+        if weather.fact?.temp != nil {
+            city.timeAndTemp.temp = weather.fact!.temp!
+        }
+        if weather.info?.tzinfo?.offset != nil {
+            city.timeAndTemp.utcDiff = weather.info!.tzinfo!.offset!
+        }
+        
+        do {
+            try context.save()
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+    }
+}
+
+
+
+// MARK: - MainInteractorInputProtocol
+extension MainInteractor: MainInteractorInputProtocol {
+    
+    //  CoreData layer
     func fetchCountrys() {
         
         let fetchRequest: NSFetchRequest<Country> = Country.fetchRequest()
@@ -37,6 +70,19 @@ class MainInteractor: MainInteractorInputProtocol {
             countrys = try context.fetch(fetchRequest)
             presenter?.updateCountrysArray(countrys)
             print("countrys.count = \(countrys.count)")
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func resetAllRecords() {
+        
+        let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Country")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
+        do {
+            try context.execute(deleteRequest)
+            try context.save()
+            fetchCountrys()
         } catch let error as NSError {
             print(error.localizedDescription)
         }
@@ -53,20 +99,6 @@ class MainInteractor: MainInteractorInputProtocol {
         do {
             try context.save()
             self.fetchCountrys()
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-    }
-    
-    func resetAllRecords() {
-        
-        let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Country")
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
-        do {
-            try context.execute(deleteRequest)
-            try context.save()
-            countrys = [Country]()
-            fetchCountrys()
         } catch let error as NSError {
             print(error.localizedDescription)
         }
@@ -124,7 +156,7 @@ class MainInteractor: MainInteractorInputProtocol {
             return timeAndTemp
         }
         
-        // Create only city
+        /// Create only city
         if let country = countrys.filter({ $0.name == citySearch.country }).first {
             
             do {
@@ -145,7 +177,7 @@ class MainInteractor: MainInteractorInputProtocol {
             }
             
         } else {
-            // Create country and city
+            /// Create country and city
             do {
                 guard let entity = NSEntityDescription.entity(forEntityName: "Country", in: context) else { return }
                 
@@ -175,38 +207,15 @@ class MainInteractor: MainInteractorInputProtocol {
         }
     }
     
-    func updateImg(image: Data, in country: Country) {
-        country.flagData = image
-        
-        do {
-            try context.save()
-
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-    }
     
-    func updateWeather(with weather: WeatherSimple, in city: City) {
-        if weather.fact?.temp != nil {
-            city.timeAndTemp.temp = weather.fact!.temp!
-        }
-        if weather.info?.tzinfo?.offset != nil {
-            city.timeAndTemp.utcDiff = weather.info!.tzinfo!.offset!
-        }
-        
-        do {
-            try context.save()
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-    }
     
     // MARK: - Request
     func requestFlagImg(country: Country) {
+
+        let iso = country.isoA2.lowercased()
+      ///  let url = "https://countryflagsapi.com/png/\(country.isoA2)"
         
-        let url = "https://countryflagsapi.com/png/\(country.isoA2)"
-        
-        guard let url = URL(string: url) else { return }
+        guard let url = URL(string: "https://flagcdn.com/w40/\(iso).jpg") else { return }
         
         AF.request(url).responseData { [unowned self] response in
             switch response.result {
@@ -219,7 +228,6 @@ class MainInteractor: MainInteractorInputProtocol {
             }
         }
     }
-    
     
     func requestWeaher(forCity city: City) {
         

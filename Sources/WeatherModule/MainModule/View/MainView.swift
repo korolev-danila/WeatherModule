@@ -17,19 +17,17 @@ protocol MainViewOutputProtocol {
     
     func viewDidLoad()
     
-    func countrysCount() -> Int
-    func sectionArrayCount(_ section: Int) -> Int
-    
-    func headerCell(_ section: Int) -> HeaderCellViewModel
-    
     func didTapButton()
     func showDetails(index: IndexPath)
     func deleteCity(for index: IndexPath)
     func deleteAll()
-    func updateName(for index: IndexPath) -> String
-    func updateTemp(for index: IndexPath) -> String
-    func updateTime(for index: IndexPath) -> String
-    //   func updateFlag(forSection section: Int )
+    
+    func countrysCount() -> Int
+    func sectionArrayCount(_ section: Int) -> Int
+    
+    func createHeaderViewModel(_ section: Int) -> HeaderCellViewModel
+    func createCellViewModel(for index: IndexPath) -> MainCellViewModel
+    func updateFlag(forSection section: Int)
 }
 
 public class MainViewController: UIViewController {
@@ -55,7 +53,7 @@ public class MainViewController: UIViewController {
         button.clipsToBounds = false
         button.contentMode = .center
         button.imageView?.contentMode = .scaleAspectFill
-        button.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
+        button.addTarget(self, action: #selector(addTapButton), for: .touchUpInside)
         
         return button
     }()
@@ -106,7 +104,7 @@ public class MainViewController: UIViewController {
         }
         
         tableView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(70)
+            make.top.equalToSuperview()
             make.bottom.equalToSuperview()
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
@@ -137,9 +135,31 @@ public class MainViewController: UIViewController {
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneButtonTap))
         doneButton.tintColor = .blue
         self.navigationItem.setLeftBarButton(doneButton, animated: true)
-        let deleteButton = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(deleteButtonTap))
+        let deleteButton = UIBarButtonItem(title: "Delete All", style: .plain, target: self, action: #selector(deleteButtonTap))
         deleteButton.tintColor = .red
         self.navigationItem.setRightBarButton(deleteButton, animated: true)
+    }
+    
+    @objc func deleteButtonTap() {
+        showAlertButtonTapped()
+    }
+    
+    func showAlertButtonTapped() {
+        
+        let alert = UIAlertController(title: "Attention", message: "Do you want to delete all cities?",
+                                      preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler: { [weak self] _ in
+            self?.setEditButton()
+            self?.deleteIsHidden = true
+            self?.presenter.deleteAll()
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: { [weak self] _ in
+            self?.setEditButton()
+            self?.deleteIsHidden = true
+            self?.tableView.reloadData()
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
     }
     
     @objc func doneButtonTap() {
@@ -148,12 +168,7 @@ public class MainViewController: UIViewController {
         tableView.reloadData()
     }
     
-    @objc func deleteButtonTap() {
-        deleteIsHidden = true
-        presenter.deleteAll()
-    }
-    
-    @objc func didTapButton() {
+    @objc func addTapButton() {
         presenter.didTapButton()
     }
 }
@@ -192,10 +207,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         
         cell.delegate = self
         
-        cell.configureCell(name: presenter.updateName(for: indexPath),
-                           temp: presenter.updateTemp(for: indexPath),
-                           time: presenter.updateTime(for: indexPath),
-                           deleteIsHidden: deleteIsHidden)
+        cell.configureCell(presenter.createCellViewModel(for: indexPath), deleteIsHidden: deleteIsHidden)
         
         return cell
     }
@@ -206,8 +218,10 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         let headerView = HeaderView(frame: CGRect.init(x: 0, y: 0,
                                                        width: tableView.frame.width,
                                                        height: 60))
+        let viewModel = presenter.createHeaderViewModel(section)
+        if UIImage(data: viewModel.imgData) == nil { presenter.updateFlag(forSection: section)}
         
-        headerView.settingCell(presenter.headerCell(section))
+        headerView.settingCell(viewModel)
         
         return headerView
     }

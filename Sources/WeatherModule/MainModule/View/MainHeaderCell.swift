@@ -30,7 +30,6 @@ class HeaderView: UIView {
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .clear
-//        imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 13
@@ -38,6 +37,14 @@ class HeaderView: UIView {
         return imageView
     }()
     
+    let gradientLayer: CAGradientLayer = {
+        let gradient = CAGradientLayer()
+        let color1 = UIColor.gray.withAlphaComponent(0.7).cgColor
+        gradient.colors = [color1, UIColor.clear.cgColor]
+        gradient.startPoint = CGPoint(x: 0.0, y: 1.0)
+        gradient.endPoint = CGPoint(x: 0.85, y: 1.0)
+        return gradient
+    }()
     
     // MARK: - init
     override init( frame: CGRect) {
@@ -51,11 +58,16 @@ class HeaderView: UIView {
     }
     
     private func setupViews(_ heightOfCell: CGFloat) {
-        
-        self.backgroundColor = UIColor.gray
+    
+        self.backgroundColor = UIColor.clear
         self.layer.cornerRadius = 15.0
         self.layer.borderWidth = 1.0
-        self.layer.borderColor = UIColor.gray.cgColor
+        self.layer.borderColor = UIColor.clear.cgColor
+        self.clipsToBounds = true
+        
+        gradientLayer.frame = self.bounds
+        self.layer.insertSublayer(gradientLayer, at: 1)
+       
         
         self.addSubview(activityView)
         self.addSubview(imageView)
@@ -82,7 +94,9 @@ class HeaderView: UIView {
             activityView.stopAnimating()
             imageView.image = image.resize(60)
         } else {
-            activityView.startAnimating()
+            if !activityView.isAnimating {
+                activityView.startAnimating()
+            }
         }
     }
 }

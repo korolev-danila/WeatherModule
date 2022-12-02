@@ -58,7 +58,7 @@ extension SearchInteractor: SearchInteractorInputProtocol {
                             print(error)
                         }
                     }
-                    print("show citys")
+
                     self?.presenter?.showCitys(citys)
                 } catch {
                     print(error)

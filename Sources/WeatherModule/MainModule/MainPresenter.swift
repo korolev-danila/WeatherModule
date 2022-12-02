@@ -12,6 +12,12 @@ struct HeaderCellViewModel {
     let imgData: Data
 }
 
+struct MainCellViewModel {
+    let name: String
+    let temp: String
+    let time: String
+}
+
 protocol MainPresenterDelegate: AnyObject  {
     func save(_ citySearch: CitySearch)
 }
@@ -49,7 +55,6 @@ class MainPresenter {
             
             self.timer = timer
         }
-        
         print("updateTime")
     }
     
@@ -81,7 +86,7 @@ extension MainPresenter: MainViewOutputProtocol {
     
 
     
-    // MARK: - Router Method
+    // MARK: - didTap Method
     func didTapButton() {
         router.pushSearchView(delegate: self)
     }
@@ -110,49 +115,45 @@ extension MainPresenter: MainViewOutputProtocol {
         return countrys[section].citysArray.count
     }
     
-    func headerCell(_ section: Int) -> HeaderCellViewModel {
+    func createHeaderViewModel(_ section: Int) -> HeaderCellViewModel {
         
         var data = Data()
         
         if let flagData = countrys[safe: section]?.flagData {
-            data = flagData
-        } else {
-            if let country = countrys[safe: section] {
-                DispatchQueue.main.async {
-                    self.interactor.requestFlagImg(country: country)
-                }
+            if flagData == data {
+                updateFlag(forSection: section)
+            } else {
+                data = flagData
             }
+        } else {
+            updateFlag(forSection: section)
         }
         
         return HeaderCellViewModel(name: countrys[safe: section]?.name ?? "",
                                    imgData: data)
     }
     
-    
-    func updateName(for index: IndexPath) -> String {
-        return countrys[index.section].citysArray[index.row].name
-    }
-    
-    func updateTemp(for index: IndexPath) -> String {
-        return "\(Int(countrys[index.section].citysArray[index.row].timeAndTemp.temp))"
-    }
-    
-    func updateTime(for index: IndexPath) -> String {
+    func createCellViewModel(for index: IndexPath) -> MainCellViewModel {
+
+        let name = countrys[safe: index.section]?.citysArray[safe: index.row]?.name ?? ""
+        let temp = "\(Int(countrys[safe: index.section]?.citysArray[safe: index.row]?.timeAndTemp.temp ?? 0))"
         
-        let time = Date() + countrys[index.section].citysArray[index.row].timeAndTemp.utcDiff
+        let time = Date() + (countrys[safe: index.section]?.citysArray[safe: index.row]?.timeAndTemp.utcDiff ?? 0.0)
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
         let timeString = formatter.string(from: time)
         
-        return timeString
+        return  MainCellViewModel(name: name, temp: temp, time: timeString)
     }
     
-//    func updateFlag(forSection section: Int) {
-//        DispatchQueue.main.async {
-//            self.interactor.requestFlagImg(country: self.countrys[section])
-//        }
-//    }
+    func updateFlag(forSection section: Int) {
+        if let country = countrys[safe: section] {
+            DispatchQueue.main.async {
+                self.interactor.requestFlagImg(country: country)
+            }
+        }
+    }
 }
 
 // MARK: - MainInteractorOutputProtocol

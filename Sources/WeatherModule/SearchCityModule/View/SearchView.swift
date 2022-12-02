@@ -19,8 +19,8 @@ protocol SearchViewInputProtocol: AnyObject {
 
 protocol SearchViewOutputProtocol {
     
-    func citysCount() -> Int
     func viewModel(_ index: IndexPath) -> SearchViewModel
+    func citysCount() -> Int
     func save(_ index: IndexPath)
     func requestCities(_ string: String)
     

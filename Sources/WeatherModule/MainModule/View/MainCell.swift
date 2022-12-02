@@ -149,10 +149,10 @@ class MainCell: UITableViewCell {
         
     }
     
-    func configureCell(name: String, temp: String, time: String, deleteIsHidden: Bool) {
-        nameLabel.text = name
-        tempLabel.text = temp    
-        timeLabel.text = time
+    func configureCell(_ viewModel: MainCellViewModel, deleteIsHidden: Bool) {
+        nameLabel.text = viewModel.name
+        tempLabel.text = viewModel.temp
+        timeLabel.text = viewModel.time
         self.deleteIsHidden = deleteIsHidden
     }
 }
