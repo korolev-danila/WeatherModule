@@ -42,6 +42,7 @@ class MainInteractor {
     
     private func updateWeather(with weather: WeatherSimple, in city: City) {
         if weather.fact?.temp != nil {
+            city.timeAndTemp.isNil = false 
             city.timeAndTemp.temp = weather.fact!.temp!
         }
         if weather.info?.tzinfo?.offset != nil {
@@ -152,6 +153,7 @@ extension MainInteractor: MainInteractorInputProtocol {
             timeAndTemp.city = city
             timeAndTemp.temp = 0.0
             timeAndTemp.utcDiff = 0.0
+            timeAndTemp.isNil = true
             
             return timeAndTemp
         }
@@ -215,7 +217,7 @@ extension MainInteractor: MainInteractorInputProtocol {
         let iso = country.isoA2.lowercased()
       ///  let url = "https://countryflagsapi.com/png/\(country.isoA2)"
         
-        guard let url = URL(string: "https://flagcdn.com/w40/\(iso).jpg") else { return }
+        guard let url = URL(string: "https://flagcdn.com/w640/\(iso).jpg") else { return }
         
         AF.request(url).responseData { [unowned self] response in
             switch response.result {

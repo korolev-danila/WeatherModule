@@ -37,7 +37,7 @@ class HeaderView: UIView {
         return imageView
     }()
     
-    let gradientLayer: CAGradientLayer = {
+    private let gradientLayer: CAGradientLayer = {
         let gradient = CAGradientLayer()
         let color1 = UIColor.gray.withAlphaComponent(0.7).cgColor
         gradient.colors = [color1, UIColor.clear.cgColor]

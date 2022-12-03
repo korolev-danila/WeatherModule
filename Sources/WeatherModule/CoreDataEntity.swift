@@ -64,6 +64,7 @@ extension City: Identifiable {
 public final class TimeAndTemp: NSManagedObject {
     @NSManaged var temp: Double
     @NSManaged var utcDiff: Double
+    @NSManaged var isNil: Bool
     
     @NSManaged var city: City
 }
@@ -71,17 +72,6 @@ public final class TimeAndTemp: NSManagedObject {
 extension TimeAndTemp: Identifiable {
     @nonobjc public class func fetchRequest() -> NSFetchRequest<TimeAndTemp> {
         return NSFetchRequest<TimeAndTemp>(entityName: "TimeAndTemp")
-    }
-}
-
-public final class SvgImg: NSManagedObject {
-    @NSManaged var iconName: String
-    @NSManaged var svg: String
-}
-
-extension SvgImg: Identifiable {
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<SvgImg> {
-        return NSFetchRequest<SvgImg>(entityName: "SvgImg")
     }
 }
 
@@ -106,6 +96,8 @@ func managedObjectModel() -> NSManagedObjectModel {
     
     let model = NSManagedObjectModel()
     
+    
+    
     // MARK: - CountryEntity
     
     let countryEnt = NSEntityDescription()
@@ -126,6 +118,7 @@ func managedObjectModel() -> NSManagedObjectModel {
     countryFlagDataAttr.name = "flagData"
     countryFlagDataAttr.attributeType = .binaryDataAttributeType
     countryFlagDataAttr.isOptional = true
+    
     
     
     // MARK: - CityEntity
@@ -156,6 +149,8 @@ func managedObjectModel() -> NSManagedObjectModel {
     populationAttr.name = "population"
     populationAttr.attributeType = .doubleAttributeType
     
+    
+    
     // MARK: - TimeAndTempEntity
     
     let timeAndTempEnt = NSEntityDescription()
@@ -172,21 +167,10 @@ func managedObjectModel() -> NSManagedObjectModel {
     utcDiffAttr.name = "utcDiff"
     utcDiffAttr.attributeType = .doubleAttributeType
     
-    // MARK: - SvgImgEntity
+    let isNilAttr = NSAttributeDescription()
+    isNilAttr.name = "isNil"
+    isNilAttr.attributeType = .booleanAttributeType
     
-    let svgImgEnt = NSEntityDescription()
-    svgImgEnt.name = "SvgImg"
-    svgImgEnt.managedObjectClassName = NSStringFromClass(SvgImg.self)
-    
-    // Attributes
-    
-    let iconNameAttr = NSAttributeDescription()
-    iconNameAttr.name = "iconName"
-    iconNameAttr.attributeType = .stringAttributeType
-    
-    let svgAttr = NSAttributeDescription()
-    svgAttr.name = "svg"
-    svgAttr.attributeType = .stringAttributeType
     
     // MARK: - Relationships
     
@@ -231,11 +215,10 @@ func managedObjectModel() -> NSManagedObjectModel {
                           populationAttr,
                           cityToCountry,
                           cityToTime]
-    timeAndTempEnt.properties = [tempAttr, utcDiffAttr, timeToCity]
-    svgImgEnt.properties = [iconNameAttr, svgAttr]
+    timeAndTempEnt.properties = [tempAttr, utcDiffAttr, isNilAttr, timeToCity]
     
     
-    model.entities = [countryEnt, cityEnt, timeAndTempEnt, svgImgEnt]
+    model.entities = [countryEnt, cityEnt, timeAndTempEnt]
     
     return model
 }

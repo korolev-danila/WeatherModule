@@ -14,7 +14,7 @@ struct HeaderCellViewModel {
 
 struct MainCellViewModel {
     let name: String
-    let temp: String
+    let temp: String?
     let time: String
 }
 
@@ -25,16 +25,17 @@ protocol MainPresenterDelegate: AnyObject  {
 class MainPresenter {
     
     weak var view: MainViewInputProtocol?
-    let router: MainRouterProtocol
-    let interactor: MainInteractorInputProtocol
+    private let router: MainRouterProtocol
+    private let interactor: MainInteractorInputProtocol
     
-    var countrys: [Country] = [] {
+    private var countrys: [Country] = [] {
         didSet {
             view?.reloadTableView()
         }
     }
     
     var timer: Timer?
+ //   var firstLaunch = true
     
     init(interactor: MainInteractorInputProtocol, router: MainRouterProtocol){
         self.interactor = interactor
@@ -43,7 +44,7 @@ class MainPresenter {
   
     
     // MARK: - Update properties
-    func startTimer() {
+    private func startTimer() {
         if  timer == nil {
             let timer = Timer(timeInterval: 60.0,
                               target: self,
@@ -62,7 +63,7 @@ class MainPresenter {
         view?.reloadTableView()
     }
     
-    func updateAllTemp() {
+    private func updateAllTemp() {
         DispatchQueue.main.async {
             for country in self.countrys {
                 for city in country.citysArray {
@@ -86,7 +87,7 @@ extension MainPresenter: MainViewOutputProtocol {
     
 
     
-    // MARK: - didTap Method
+    // MARK: - Actions
     func didTapButton() {
         router.pushSearchView(delegate: self)
     }
@@ -136,13 +137,20 @@ extension MainPresenter: MainViewOutputProtocol {
     func createCellViewModel(for index: IndexPath) -> MainCellViewModel {
 
         let name = countrys[safe: index.section]?.citysArray[safe: index.row]?.name ?? ""
-        let temp = "\(Int(countrys[safe: index.section]?.citysArray[safe: index.row]?.timeAndTemp.temp ?? 0))"
         
-        let time = Date() + (countrys[safe: index.section]?.citysArray[safe: index.row]?.timeAndTemp.utcDiff ?? 0.0)
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        let timeString = formatter.string(from: time)
+        var temp: String? = nil
+        var timeString: String = ""
+        if let bool = countrys[safe: index.section]?.citysArray[safe: index.row]?.timeAndTemp.isNil {
+            
+            if !bool {
+                let time = Date() + (countrys[safe: index.section]?.citysArray[safe: index.row]?.timeAndTemp.utcDiff ?? 0.0)
+                let formatter = DateFormatter()
+                formatter.dateFormat = "HH:mm"
+                formatter.timeZone = TimeZone(secondsFromGMT: 0)
+                timeString = formatter.string(from: time)
+                temp = "\(Int(countrys[safe: index.section]?.citysArray[safe: index.row]?.timeAndTemp.temp ?? 0))"
+            }
+        }
         
         return  MainCellViewModel(name: name, temp: temp, time: timeString)
     }

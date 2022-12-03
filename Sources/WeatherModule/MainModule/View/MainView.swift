@@ -115,7 +115,8 @@ public class MainViewController: UIViewController {
     
     // MARK: - NavigationBar UI&Method
     func settingNC() {
-        self.navigationController?.navigationBar.topItem?.title = "Weather App"
+        self.navigationController?.navigationBar.topItem?.title = "Weather of Citys"
+        self.navigationController?.navigationBar.prefersLargeTitles = true
         setEditButton()
     }
     
@@ -242,6 +243,7 @@ extension MainViewController: MainViewCellDelegate {
 
 // MARK: - UIImage resize
 extension UIImage {
+    /// change the image size by pixels
     func resize(_ max_size: CGFloat) -> UIImage {
         let max_size_pixels = max_size / UIScreen.main.scale
         let aspectRatio =  size.width/size.height

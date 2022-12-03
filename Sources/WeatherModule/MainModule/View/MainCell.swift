@@ -16,7 +16,7 @@ class MainCell: UITableViewCell {
     
     weak var delegate: MainViewCellDelegate?
     
-    var deleteIsHidden: Bool = true {
+    private var deleteIsHidden: Bool = true {
         didSet {
             deleteButton.isHidden = deleteIsHidden
             deleteButton.isEnabled = !deleteIsHidden
@@ -75,6 +75,12 @@ class MainCell: UITableViewCell {
         return label
     }()
     
+    private let activityView: UIActivityIndicatorView = {
+        let activity = UIActivityIndicatorView(style: .medium)
+        activity.contentMode = .center
+        return activity
+    }()
+    
     private  let deleteButton: UIButton = {
         let button = UIButton()
         let image = UIImage(systemName: "xmark.circle",
@@ -104,7 +110,7 @@ class MainCell: UITableViewCell {
         delegate?.delete(cell: self)
     }
     
-    func setupViews() {
+    private func setupViews() {
         self.backgroundColor = .clear
         self.selectionStyle = .none
         
@@ -113,6 +119,7 @@ class MainCell: UITableViewCell {
         self.addSubview(tempLabel)
         self.addSubview(cLabel)
         self.addSubview(timeLabel)
+        self.addSubview(activityView)
         
         nameLabel.snp.makeConstraints { make in
             make.leading.equalTo(30)
@@ -147,12 +154,35 @@ class MainCell: UITableViewCell {
             make.bottom.equalTo(-2)
         }
         
+        activityView.snp.makeConstraints { make in
+            make.trailing.equalTo(timeLabel.snp.leading).offset(-14)
+            make.top.equalTo(2)
+            make.bottom.equalTo(-2)
+        }
+        
     }
     
-    func configureCell(_ viewModel: MainCellViewModel, deleteIsHidden: Bool) {
+    
+    public func configureCell(_ viewModel: MainCellViewModel, deleteIsHidden: Bool) {
+        if viewModel.temp == nil {
+            if !activityView.isAnimating {
+                self.activityView.startAnimating()
+                timeLabel.isHidden = true
+                tempLabel.isHidden = true
+                cLabel.isHidden = true
+            }
+        } else {
+            activityView.stopAnimating()
+            tempLabel.text = viewModel.temp
+            timeLabel.text = viewModel.time
+            timeLabel.isHidden = false
+            tempLabel.isHidden = false
+            cLabel.isHidden = false
+        }
+        
         nameLabel.text = viewModel.name
-        tempLabel.text = viewModel.temp
-        timeLabel.text = viewModel.time
+        
+        
         self.deleteIsHidden = deleteIsHidden
     }
 }

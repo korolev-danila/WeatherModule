@@ -7,79 +7,64 @@
 
 import Foundation
 import Alamofire
-import CoreData
 
 protocol DetailsInteractorInputProtocol {
     func requestWeaher(forCity city: City)
-    func getIcons(weather: Weather) -> Weather
-    func fetchSvgImg()
 }
 
 protocol DetailsInteractorOutputProtocol: AnyObject {
     func updateViewWeather(_ weather: Weather)
 }
 
-class DetailsInteractor: DetailsInteractorInputProtocol {
+class DetailsInteractor {
     
     weak var presenter: DetailsInteractorOutputProtocol?
     
-    var svgImgs: [SvgImg] = []
-    
-    // MARK: - CoreData layer
-    func fetchSvgImg() {
-        
-        let fetchRequest: NSFetchRequest<SvgImg> = SvgImg.fetchRequest()
-        
-        do {
-            svgImgs = try context.fetch(fetchRequest)
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-    }
-    
-    func save(icon: String, svg: String) {
-        if svgImgs.filter({ $0.iconName == icon }).first == nil {
-            
-            guard let svgEntity = NSEntityDescription.entity(forEntityName: "SvgImg", in: context) else { return }
-            
-            let svgImg = SvgImg(entity: svgEntity, insertInto: context)
-            svgImg.iconName = icon
-            svgImg.svg = svg
-           
-            do {
-                try context.save()
-                svgImgs.append(svgImg)
-            } catch let error as NSError {
-                print(error.localizedDescription)
-            }
-        }
-    }
-    
-    func  getIcons(weather: Weather) -> Weather {
+    private func  fetchIcons(weather: Weather) {
         
         var weatherLocal = weather
+        
         if weatherLocal.forecasts != nil {
             var index = 0
-            
+            var counte = 0
             for _ in weatherLocal.forecasts! {
                 
                 if let icon = weatherLocal.forecasts![index].parts?.dayShort?.icon {
-        
-                    if let model = svgImgs.filter({ $0.iconName == icon }).first {
-                        weatherLocal.forecasts![index].svgStr = model.svg
-                    } else {
-                        DispatchQueue.main.async {
-                            self.fetchIcon(icon)
+                    requestIcon(icon,index: index) { [weak self] (i,svg) in
+                        if weatherLocal.forecasts!.count > i {
+                            weatherLocal.forecasts![i].svgStr = svg
+                        }
+                        counte += 1
+                        if counte == weatherLocal.forecasts?.count {
+                            self?.presenter?.updateViewWeather(weatherLocal)
                         }
                     }
                 }
                 index += 1
             }
         }
-        
-        return weatherLocal
     }
+    
+    private func requestIcon(_ icon: String,index: Int, completion: @escaping (_ i: Int,_ svg: String) -> ()) {
+        
+        let url = "https://yastatic.net/weather/i/icons/funky/dark/\(icon).svg"
+        
+        guard let url = URL(string: url) else { return }
+        AF.request(url).responseData { response in
+            switch response.result {
+            case .success(let data):
+  
+                let str = String(decoding: data, as: UTF8.self)
+                completion(index,str)
+                
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+}
 
+extension DetailsInteractor: DetailsInteractorInputProtocol {
     
     // MARK: - Api request layer
     func requestWeaher(forCity city: City) {
@@ -104,8 +89,10 @@ class DetailsInteractor: DetailsInteractorInputProtocol {
                 guard let parsedResult: Weather = try? JSONDecoder().decode(Weather.self, from: data) else {
                     return
                 }
-                let weatherUp = self.getIcons(weather: parsedResult)
-                self.presenter?.updateViewWeather(weatherUp)
+                self.presenter?.updateViewWeather(parsedResult)
+                DispatchQueue.main.async {
+                    self.fetchIcons(weather: parsedResult)
+                }
   
             case .failure(let error):
                 print(error)
@@ -126,26 +113,4 @@ class DetailsInteractor: DetailsInteractorInputProtocol {
 //        // https://developers.amadeus.com/self-service/category/air/api-doc/airport-and-city-search/api-reference
 //
 //    }
-    
-    func fetchIcon(_ icon: String) {
-        
-        let url = "https://yastatic.net/weather/i/icons/funky/dark/\(icon).svg"
-        
-        guard let url = URL(string: url) else { return }
-        AF.request(url).responseData { response in
-            switch response.result {
-            case .success(let data):
-  
-                let str = String(decoding: data, as: UTF8.self)
-                let svg = String(str.dropFirst(84)) /// в presentere возвращается строка с нужными размерами
-                
-                weak var _self = self
-                
-                _self?.save(icon: icon, svg: svg)
-                
-            case .failure(let error):
-                print(error)
-            }
-        }
-    }
 }

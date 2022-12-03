@@ -7,16 +7,40 @@
 
 import Foundation
 
+struct CityViewModel {
+    let cityName: String
+    let countryFlag: Data?
+    let isCapital: Bool
+    let populationOfCity: String
+}
+
+struct FactViewModel {
+    let season: String
+    let condition: String
+    let windSpeed: String
+    let windGust: String
+    let windDir: String
+    let pressureMm: String
+}
+
+struct ForecastViewModel {
+    let dayTemp: String
+    let nightTemp: String
+    let date: String
+    let week: String
+    let svgStr: String
+}
+
 
 class DetailsPresenter {
     
-    let interactor: DetailsInteractorInputProtocol
+    private let interactor: DetailsInteractorInputProtocol
+    private let router: DetailsRouterProtocol
     weak var view: DetailsViewInputProtocol?
-    var router: DetailsRouterProtocol
     
     
-    let city: City
-    var weather: Weather? {
+    private let city: City
+    private var weather: Weather? {
         didSet {
             view?.reloadCollection()
         }
@@ -34,82 +58,46 @@ class DetailsPresenter {
 extension DetailsPresenter: DetailsViewOutputProtocol {
     
     func viewDidLoad() {
-     //   interactor.fetchSvgImg()
-     //   interactor.requestWeaher(forCity: city)
-        view?.configureCityView()
         
-    }
-    
-    func updateIcons() {
-        if weather != nil {
-            DispatchQueue.main.async {
-                self.weather = self.interactor.getIcons(weather: self.weather!)
-            }
-        }
+        interactor.requestWeaher(forCity: city)
+        view?.configureCityView()
     }
     
     func popVC() {
         router.popVC()
     }
     
-    // MARK: - Update View Method
-    func countryFlag() -> Data? {
-        return city.country.flagData
-    }
-    
-    func cityName() -> String {
-        return city.name
-    }
-    
-    func isCapital() -> Bool {
-        return city.isCapital
-    }
-    
-    func populationOfCity() -> String {
-        
+    func createCityViewModel() -> CityViewModel {
+        var population = ""
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        guard let string = formatter.string(for: Int(city.population)) else { return "" }
-        return string
-    }
-    
-    func forecastCount() -> Int {
-        if let count = weather?.forecasts?.count {
-            return count
+        if let string = formatter.string(for: Int(city.population)){
+            population = string
         }
-        return 0
+        
+        return CityViewModel(cityName: city.name,
+                             countryFlag: city.country.flagData,
+                             isCapital: city.isCapital,
+                             populationOfCity: population)
     }
     
-    func factSeason() -> String {
-        if let string = weather?.fact?.season {
-            return string
-        }
-        return ""
-    }
-    
-    func factCondition() -> String {
-        if let string = weather?.fact?.condition {
-            return string
-        }
-        return ""
-    }
-    
-    func factWindSpeed() -> String {
-        if let double = weather?.fact?.windSpeed {
-            return "\(double) m/c"
-        }
-        return ""
-    }
-    
-    func factWindGust() -> String {
-        if let double = weather?.fact?.windGust {
-            return "\(double) m/c"
-        }
-        return ""
-    }
-    
-    func factWindDir() -> String {
+    func createFactViewModel() -> FactViewModel {
+        
+        var windSpeed = ""
+        var gust = ""
+        var pressur = ""
         var dir = ""
+        
+        if let speed = weather?.fact?.windSpeed {
+            windSpeed = "\(speed) m/c"
+        }
+        if let double = weather?.fact?.windGust {
+            gust = "\(double) m/c"
+        }
+        if let double = weather?.fact?.pressureMm {
+            pressur = "\(Int(double)) mm"
+        }
+        
         switch weather?.fact?.windDir  {
         case "nw": dir = "north-west"
         case "n": dir = "north"
@@ -123,15 +111,61 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
         case .none: dir = "windless"
         case .some(_): dir = ""
         }
-        return dir
+
+        return FactViewModel(season: weather?.fact?.season ?? "",
+                             condition: weather?.fact?.condition ?? "",
+                             windSpeed: windSpeed,windGust: gust,
+                             windDir: dir, pressureMm: pressur)
     }
     
-    func factPressureMm() -> String {
-        if let double = weather?.fact?.pressureMm {
-            return "\(Int(double)) mm"
+    func forecastCount() -> Int {
+        if let count = weather?.forecasts?.count {
+            return count
         }
-        return ""
+        return 0
     }
+    
+    func forecastViewModel(heightOfCell: Double, index: IndexPath) -> ForecastViewModel {
+        var dayTemp = ""
+        var nightTemp = ""
+        var date = ""
+        var week = ""
+        var svgStr = ""
+
+        if let  day = weather?.forecasts?[safe: index.row] {
+            if let temp = day.parts?.dayShort?.temp {
+                dayTemp = "\(Int(temp))"
+            }
+            if let temp = day.parts?.nightShort?.temp {
+                nightTemp = "\(Int(temp))"
+            }
+            if day.date != nil {
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+                
+                if let dateSelf = dateFormatter.date(from: day.date!) {
+                    dateFormatter.dateFormat = "dd.MM"
+                    date = dateFormatter.string(from: dateSelf)
+                    dateFormatter.dateFormat = "EEEE"
+                    week = dateFormatter.string(from: dateSelf)
+                }
+            }
+            if let svg = day.svgStr {
+                let svgOld = String(svg.dropFirst(84))
+                let svgNew = """
+    <svg xmlns="http://www.w3.org/2000/svg" width="\(heightOfCell*2)" height="\(heightOfCell*2)" viewBox="0 2 28 28">
+    """
+                svgStr = svgNew + svgOld
+            }
+        }
+ 
+        return ForecastViewModel(dayTemp: dayTemp, nightTemp: nightTemp,
+                                 date: date, week: week, svgStr: svgStr)
+    }
+    
+    
+    
     
     func updateCell(heightOfCell: Double, index: IndexPath) -> (dayTemp: String, nightTemp: String,
                                                                     date: String, week: String, svgStr: String?) {
@@ -173,8 +207,6 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
 <svg xmlns="http://www.w3.org/2000/svg" width="\(heightOfCell*2)" height="\(heightOfCell*2)" viewBox="0 2 28 28">
 """
             svgStr = svgNew + day.svgStr!
-        } else {
-            updateIcons()
         }
         
         return (dayTemp, nightTemp, date, week, svgStr)

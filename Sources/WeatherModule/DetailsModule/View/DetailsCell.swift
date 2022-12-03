@@ -12,7 +12,7 @@ import WebKit
 
 class CollectionCell: UICollectionViewCell {
     
-    var webView: WKWebView = {
+    private let webView: WKWebView = {
         let preferences = WKPreferences()
         preferences.javaScriptEnabled = false
         let configuration = WKWebViewConfiguration()
@@ -28,7 +28,7 @@ class CollectionCell: UICollectionViewCell {
         return wv
     }()
     
-    var iconActivityView: UIActivityIndicatorView = {
+    private let iconActivityView: UIActivityIndicatorView = {
         let activity = UIActivityIndicatorView(style: .medium)
         activity.contentMode = .center
         activity.backgroundColor = .clear
@@ -37,7 +37,7 @@ class CollectionCell: UICollectionViewCell {
         return activity
     }()
     
-    var vcWebDelegate: VCWebDelegate?
+    private let vcWebDelegate = VCWebDelegate()
     
     
     
@@ -172,9 +172,9 @@ class CollectionCell: UICollectionViewCell {
         self.addSubview(webView)
         self.addSubview(iconActivityView)
         
-        self.vcWebDelegate = VCWebDelegate()
-        self.vcWebDelegate?.webView = webView
-        self.vcWebDelegate?.iconActivityView = iconActivityView
+        self.vcWebDelegate.webView = webView
+        self.vcWebDelegate.iconActivityView = iconActivityView
+
         
         tempView.addSubview(dayTextLabel)
         tempView.addSubview(dayTempLabel)
@@ -258,17 +258,16 @@ class CollectionCell: UICollectionViewCell {
     }
     
     // MARK: - configureCell
-    func configureCell(dayTemp: String, nightTemp: String,
-                        date: String, week: String, svgStr: String?) {
+    func configureCell(_ viewModel: ForecastViewModel) {
         
-        dayTempLabel.text = dayTemp
-        nightTempLabel.text = nightTemp
-        dateLabel.text = date
-        dayOfTheWeekLabel.text = week
+        dayTempLabel.text = viewModel.dayTemp
+        nightTempLabel.text = viewModel.nightTemp
+        dateLabel.text = viewModel.date
+        dayOfTheWeekLabel.text = viewModel.week
         
-        if svgStr != nil {
-            vcWebDelegate?.setDelegate()
-            webView.loadHTMLString(svgStr!, baseURL: nil)
+        if viewModel.svgStr != "" {
+            vcWebDelegate.setDelegate()
+            webView.loadHTMLString(viewModel.svgStr, baseURL: nil)
         }
     }
 }
@@ -304,10 +303,11 @@ extension VCWebDelegate: WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            self.webView?.isHidden = false
-            self.iconActivityView?.stopAnimating()
-        }
+        self.webView?.isHidden = false
+        self.iconActivityView?.stopAnimating()
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+//
+//        }
     }
     
 }
