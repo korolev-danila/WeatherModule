@@ -61,6 +61,7 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
         
         interactor.requestWeaher(forCity: city)
         view?.configureCityView()
+        interactor.getNewsForCity(city.name)
     }
     
     func popVC() {

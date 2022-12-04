@@ -10,6 +10,7 @@ import Alamofire
 
 protocol DetailsInteractorInputProtocol {
     func requestWeaher(forCity city: City)
+    func getNewsForCity(_ cityName: String)
 }
 
 protocol DetailsInteractorOutputProtocol: AnyObject {
@@ -118,17 +119,37 @@ extension DetailsInteractor: DetailsInteractorInputProtocol {
         }
     }
     
-//    func getPhotoOfCity(name: String, completion: @escaping (_ image: Data ) -> ()) {
-//
-//
-//        // https://api.teleport.org/api/urban_areas/slug:amsterdam/images/
-//
-//        // https://api.teleport.org/api/locations/37.77493,-122.41942/
-//
-//        // https://maps.googleapis.com/maps/api/place/findplacefromtext
-//
-//        // https://airlabs.co/docs/cities slug and
-//        // https://developers.amadeus.com/self-service/category/air/api-doc/airport-and-city-search/api-reference
-//
-//    }
+    func getNewsForCity(_ cityName: String) {
+
+        let name = cityName.replacingOccurrences(of: " ", with: "+")
+        
+        let removeOneWeek = Calendar.current.date(byAdding: .weekOfYear, value: -2, to: Date())
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        var timeString = formatter.string(from: Date())
+        let dateNow = formatter.string(from: Date())
+        if let date = removeOneWeek {
+            timeString = formatter.string(from: date)
+        }
+        
+        let url =  "https://newsapi.org/v2/everything?q=\(name)&from=\(timeString)&to=\(dateNow)&sortBy=popularity&language=en&searchIn=title,description"
+        let headers: HTTPHeaders = [
+            "X-Api-Key": "23b8c5c9589346c7afb95b7f4fd8f81d"
+        ]
+        
+        guard let url = URL(string: url) else { return }
+        AF.request(url,method: .get, headers: headers).responseData { response in
+            switch response.result {
+            case .success(let data):
+                print(data)
+                let jsonArray = try? JSONSerialization.jsonObject(with: data, options : .allowFragments) as? Dictionary<String,Any>
+                print(jsonArray)
+                let news = try? JSONDecoder().decode(News.self, from: data)
+
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
 }
