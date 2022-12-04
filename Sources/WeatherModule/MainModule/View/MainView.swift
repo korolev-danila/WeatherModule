@@ -86,6 +86,13 @@ public class MainViewController: UIViewController {
         presenter.viewDidLoad()
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        tableView.reloadData()
+    }
+
+     
     private func initialize() {
         
         view.backgroundColor = .white

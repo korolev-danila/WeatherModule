@@ -62,6 +62,23 @@ class DetailsInteractor {
             }
         }
     }
+    
+    private func updateAndSaveCityWeather(city: City, weather: Weather) {
+        
+        if weather.fact?.temp != nil {
+            city.timeAndTemp.isNil = false
+            city.timeAndTemp.temp = weather.fact!.temp!
+        }
+        if weather.info?.tzinfo?.offset != nil {
+            city.timeAndTemp.utcDiff = weather.info!.tzinfo!.offset!
+        }
+        
+        do {
+            try context.save()
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+    }
 }
 
 extension DetailsInteractor: DetailsInteractorInputProtocol {
@@ -90,6 +107,7 @@ extension DetailsInteractor: DetailsInteractorInputProtocol {
                     return
                 }
                 self.presenter?.updateViewWeather(parsedResult)
+                self.updateAndSaveCityWeather(city: city, weather: parsedResult)
                 DispatchQueue.main.async {
                     self.fetchIcons(weather: parsedResult)
                 }
