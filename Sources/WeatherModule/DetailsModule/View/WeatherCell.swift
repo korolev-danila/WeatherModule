@@ -49,7 +49,7 @@ class CollectionCell: UICollectionViewCell {
         label.numberOfLines = 1
         label.minimumScaleFactor = 0.05
         label.baselineAdjustment = .alignBaselines
-        label.textAlignment  = .left
+        label.textAlignment  = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         
         return label

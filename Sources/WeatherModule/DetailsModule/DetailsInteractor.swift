@@ -15,6 +15,7 @@ protocol DetailsInteractorInputProtocol {
 
 protocol DetailsInteractorOutputProtocol: AnyObject {
     func updateViewWeather(_ weather: Weather)
+    func updateNews(_ news: News)
 }
 
 class DetailsInteractor {
@@ -123,7 +124,7 @@ extension DetailsInteractor: DetailsInteractorInputProtocol {
 
         let name = cityName.replacingOccurrences(of: " ", with: "+")
         
-        let removeOneWeek = Calendar.current.date(byAdding: .weekOfYear, value: -2, to: Date())
+        let removeOneWeek = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
@@ -133,7 +134,8 @@ extension DetailsInteractor: DetailsInteractorInputProtocol {
             timeString = formatter.string(from: date)
         }
         
-        let url =  "https://newsapi.org/v2/everything?q=\(name)&from=\(timeString)&to=\(dateNow)&sortBy=popularity&language=en&searchIn=title,description"
+        let url =  "https://newsapi.org/v2/everything?q=\(name)&from=\(timeString)&to=\(dateNow)&sortBy=popularity&language=en&searchIn=title"
+        // description
         let headers: HTTPHeaders = [
             "X-Api-Key": "23b8c5c9589346c7afb95b7f4fd8f81d"
         ]
@@ -142,10 +144,10 @@ extension DetailsInteractor: DetailsInteractorInputProtocol {
         AF.request(url,method: .get, headers: headers).responseData { response in
             switch response.result {
             case .success(let data):
-                print(data)
-                let jsonArray = try? JSONSerialization.jsonObject(with: data, options : .allowFragments) as? Dictionary<String,Any>
-                print(jsonArray)
-                let news = try? JSONDecoder().decode(News.self, from: data)
+                guard let parsedResult: News = try? JSONDecoder().decode(News.self, from: data) else {
+                    return
+                }
+                self.presenter?.updateNews(parsedResult)
 
             case .failure(let error):
                 print(error.localizedDescription)

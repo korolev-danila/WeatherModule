@@ -129,10 +129,25 @@ public class MainViewController: UIViewController {
     
     func setEditButton() {
         
-        let editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editButtonTap))
-        editButton.tintColor = .blue
-        self.navigationController?.navigationBar.topItem?.setLeftBarButton(editButton, animated: true)
+        let editBarButton = UIButton(frame: CGRect(x: 0, y: 0, width: 44, height: 30))
+        editBarButton.setTitle("edit", for: .normal)
+        editBarButton.layer.cornerRadius = 12
+        editBarButton.backgroundColor = UIColor.lightGray
+        editBarButton.addTarget(self, action: #selector(editButtonTap), for: .touchUpInside)
+        
+        let leftButton = UIBarButtonItem(customView: editBarButton)
+        leftButton.tintColor = .blue
+        self.navigationItem.setLeftBarButton(leftButton, animated: true)
         self.navigationItem.setRightBarButton(nil, animated: true)
+        
+//        let editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editButtonTap))
+//        editButton.tintColor = .systemBlue
+//        editButton.customView?.backgroundColor = .systemGray
+//        editButton.customView?.clipsToBounds = true
+//        editButton.customView?.layer.cornerRadius = 8
+//
+//        self.navigationController?.navigationBar.topItem?.setLeftBarButton(editButton, animated: true)
+//        self.navigationItem.setRightBarButton(nil, animated: true)
     }
     
     @objc func editButtonTap() {
@@ -141,10 +156,16 @@ public class MainViewController: UIViewController {
         deleteIsHidden = false
         tableView.reloadData()
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneButtonTap))
-        doneButton.tintColor = .blue
+        doneButton.tintColor = .systemBlue
+        doneButton.customView?.backgroundColor = .systemGray
+        doneButton.customView?.clipsToBounds = true
+        doneButton.customView?.layer.cornerRadius = 8
         self.navigationItem.setLeftBarButton(doneButton, animated: true)
         let deleteButton = UIBarButtonItem(title: "Delete All", style: .plain, target: self, action: #selector(deleteButtonTap))
-        deleteButton.tintColor = .red
+        deleteButton.tintColor = .systemRed
+        deleteButton.customView?.backgroundColor = .systemGray
+        deleteButton.customView?.clipsToBounds = true
+        deleteButton.customView?.layer.cornerRadius = 8
         self.navigationItem.setRightBarButton(deleteButton, animated: true)
     }
     

@@ -31,6 +31,12 @@ struct ForecastViewModel {
     let svgStr: String
 }
 
+struct NewsViewModel {
+    let title: String
+    let description: String
+    let date: String
+}
+
 
 class DetailsPresenter {
     
@@ -43,6 +49,12 @@ class DetailsPresenter {
     private var weather: Weather? {
         didSet {
             view?.reloadCollection()
+        }
+    }
+    
+    private var news: News? {
+        didSet {
+            view?.reloadTableView()
         }
     }
     
@@ -61,7 +73,9 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
         
         interactor.requestWeaher(forCity: city)
         view?.configureCityView()
-        interactor.getNewsForCity(city.name)
+        DispatchQueue.main.async {
+            self.interactor.getNewsForCity(self.city.name)
+        }
     }
     
     func popVC() {
@@ -164,9 +178,7 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
         return ForecastViewModel(dayTemp: dayTemp, nightTemp: nightTemp,
                                  date: date, week: week, svgStr: svgStr)
     }
-    
-    
-    
+
     
     func updateCell(heightOfCell: Double, index: IndexPath) -> (dayTemp: String, nightTemp: String,
                                                                     date: String, week: String, svgStr: String?) {
@@ -212,6 +224,44 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
         
         return (dayTemp, nightTemp, date, week, svgStr)
     }
+    
+    func newsCount() -> Int {
+        if let count = news?.articles?.count {
+            return count
+        }
+        return 0
+    }
+    
+    func createNewsViewModel(index: IndexPath) -> NewsViewModel {
+        
+        var title = ""
+        var description = ""
+        var date = ""
+        
+        if let item = news?.articles?[safe: index.row] {
+            if item.title != nil && item.articleDescription != nil {
+                title = item.title!
+                description = item.articleDescription!
+            }
+            
+            if item.publishedAt != nil {
+                let dateFormatter = DateFormatter()
+                dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+                let datePublished = dateFormatter.date(from: item.publishedAt!)
+                dateFormatter.dateFormat = "dd.MM"
+                if datePublished != nil {
+                    date = dateFormatter.string(from: datePublished!)
+                }
+            }
+        }
+        
+        return NewsViewModel(title: title, description: description, date: date)
+    }
+    
+    func printItem(_ index: IndexPath) {
+        print(news?.articles?[index.row])
+    }
 }
 
 // MARK: - DetailsInteractorOutputProtocol
@@ -220,6 +270,10 @@ extension DetailsPresenter: DetailsInteractorOutputProtocol {
     func updateViewWeather(_ weather: Weather) {
         self.weather = weather
         view?.configureWeatherView()
+    }
+    
+    func updateNews(_ news: News) {
+        self.news = news
     }
 }
 
