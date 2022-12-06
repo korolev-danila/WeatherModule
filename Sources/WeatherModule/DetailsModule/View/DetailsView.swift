@@ -12,7 +12,7 @@ import SnapKit
 protocol DetailsViewInputProtocol: AnyObject {
     
     func configureCityView()
-    func configureWeatherView()
+    func configureWeatherView(indexCell: IndexPath)
     func reloadCollection()
     func reloadTableView()
 }
@@ -23,6 +23,7 @@ protocol DetailsViewOutputProtocol {
     func popVC()
     func createCityViewModel() -> CityViewModel
     func createFactViewModel() -> FactViewModel
+    func changeSelectCellIndex(_ index: IndexPath?) -> IndexPath
     func forecastCount() -> Int
     func forecastViewModel(heightOfCell: Double,
                            index: IndexPath) -> ForecastViewModel
@@ -35,6 +36,7 @@ protocol DetailsViewOutputProtocol {
 public class DetailsViewController: UIViewController {
     
     private let presenter: DetailsViewOutputProtocol
+    
     
     private let barButton: UIButton = {
         let button = UIButton()
@@ -57,7 +59,7 @@ public class DetailsViewController: UIViewController {
     
     private let imageView: UIImageView = {
         let iView = UIImageView()
-        iView.backgroundColor = .yellow
+        iView.backgroundColor = .clear
         iView.contentMode = .scaleToFill
         iView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -185,7 +187,7 @@ public class DetailsViewController: UIViewController {
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.top.equalToSuperview()
-            make.height.equalTo(UIScreen.main.bounds.height / 6)
+            make.height.equalTo(172) // UIScreen.main.bounds.height / 5.5
         }
         
         cityView.initialize()
@@ -229,9 +231,16 @@ extension DetailsViewController: DetailsViewInputProtocol {
         cityView.configureCityView(model)
     }
     
-    func configureWeatherView() {
+    func configureWeatherView(indexCell: IndexPath) {
+        let oldIndex = presenter.changeSelectCellIndex(indexCell)
         let model = presenter.createFactViewModel()
         
+        collectionView.cellForItem(at: oldIndex)?.layer.borderColor = UIColor.gray.cgColor
+        collectionView.cellForItem(at: oldIndex)?.layer.shadowColor = UIColor.clear.cgColor
+        
+        collectionView.cellForItem(at: indexCell)?.layer.borderColor = UIColor.darkGray.cgColor
+        collectionView.cellForItem(at: indexCell)?.layer.shadowColor = UIColor.black.cgColor
+
         cityView.configureWeatherView(model)
     }
     
@@ -257,12 +266,28 @@ extension DetailsViewController: UICollectionViewDelegate, UICollectionViewDataS
         return presenter.forecastCount()
     }
     
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        configureWeatherView(indexCell: indexPath)
+    }
+    
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! CollectionCell
         
         cell.layer.cornerRadius = 15.0
         cell.layer.borderWidth = 2.0
-        cell.layer.borderColor = UIColor.gray.cgColor
+        cell.layer.shadowOffset = CGSize(width: 0, height: 0)
+        cell.layer.shadowRadius = 4.0
+        cell.layer.shadowOpacity = 0.7
+        cell.layer.masksToBounds = false
+        
+        let selectCellIndex = presenter.changeSelectCellIndex(nil)
+        if indexPath == selectCellIndex {
+            cell.layer.borderColor = UIColor.darkGray.cgColor
+            cell.layer.shadowColor = UIColor.black.cgColor
+        } else {
+            cell.layer.borderColor = UIColor.gray.cgColor
+            cell.layer.shadowColor = UIColor.clear.cgColor
+        }
         
         cell.configureCell(presenter.forecastViewModel(heightOfCell: 100, index: indexPath))
         

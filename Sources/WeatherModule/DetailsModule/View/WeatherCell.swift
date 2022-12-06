@@ -43,11 +43,11 @@ class CollectionCell: UICollectionViewCell {
     
     private let dayOfTheWeekLabel: UILabel = {
         let label = UILabel()
-        label.text = "Monday"
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.text = "Mon"
+        label.font = UIFont.boldSystemFont(ofSize: 17)
         label.adjustsFontSizeToFitWidth = true
         label.numberOfLines = 1
-        label.minimumScaleFactor = 0.05
+        label.minimumScaleFactor = 0.5
         label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -58,10 +58,10 @@ class CollectionCell: UICollectionViewCell {
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.text = "27.11"
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = UIFont.systemFont(ofSize: 17)
         label.adjustsFontSizeToFitWidth = true
         label.numberOfLines = 1
-        label.minimumScaleFactor = 0.05
+        label.minimumScaleFactor = 0.5
         label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .left
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -186,15 +186,15 @@ class CollectionCell: UICollectionViewCell {
         dayOfTheWeekLabel.snp.makeConstraints { make in
             make.top.equalTo(6)
             make.leading.equalTo(5)
-            make.trailing.equalTo(self.snp.centerX).offset(8)
-            make.height.equalTo(12)
+            make.trailing.equalTo(self.snp.centerX).offset(-4)
+            make.height.equalTo(15)
         }
         
         dateLabel.snp.makeConstraints { make in
             make.top.equalTo(6)
             make.trailing.equalTo(-5)
-            make.leading.equalTo(dayOfTheWeekLabel.snp.trailing).offset(1)
-            make.height.equalTo(12)
+            make.leading.equalTo(dayOfTheWeekLabel.snp.trailing).offset(4)
+            make.height.equalTo(15)
             
         }
         
@@ -202,15 +202,15 @@ class CollectionCell: UICollectionViewCell {
         tempView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
-            make.top.equalTo(dayOfTheWeekLabel.snp.bottom).offset(4)
+            make.top.equalTo(dayOfTheWeekLabel.snp.bottom).offset(2)
             make.height.equalTo(30)
         }
         
         dayTextLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
-            make.height.equalTo(12)
-            make.leading.equalToSuperview()
-            make.trailing.equalTo(tempView.snp.centerX).offset(-4)
+            make.height.equalTo(14)
+            make.leading.equalToSuperview().offset(4)
+            make.trailing.equalTo(self.snp.centerX).offset(-2)
         }
         dayTempLabel.snp.makeConstraints { make in
             make.bottom.equalTo(dayTextLabel.snp.bottom)
@@ -226,9 +226,9 @@ class CollectionCell: UICollectionViewCell {
         
         nightTextLabel.snp.makeConstraints { make in
             make.top.equalTo(dayTextLabel.snp.bottom)
-            make.height.equalTo(12)
-            make.leading.equalToSuperview()
-            make.trailing.equalTo(tempView.snp.centerX).offset(-4)
+            make.height.equalTo(14)
+            make.leading.equalToSuperview().offset(2)
+            make.trailing.equalTo(self.snp.centerX).offset(-2)
         }
         nightTempLabel.snp.makeConstraints { make in
             make.bottom.equalTo(nightTextLabel.snp.bottom)
