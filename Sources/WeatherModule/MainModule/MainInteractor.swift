@@ -21,6 +21,7 @@ protocol MainInteractorInputProtocol {
 
 protocol MainInteractorOutputProtocol: AnyObject {
     func updateCountrysArray(_ array: [Country])
+    func updateTableView()
 }
 
 class MainInteractor {
@@ -35,6 +36,7 @@ class MainInteractor {
         do {
             try context.save()
             fetchCountrys()
+            presenter?.updateTableView()
         } catch let error as NSError {
             print(error.localizedDescription)
         }
@@ -51,6 +53,7 @@ class MainInteractor {
         
         do {
             try context.save()
+            presenter?.updateTableView()
         } catch let error as NSError {
             print(error.localizedDescription)
         }
@@ -167,6 +170,7 @@ extension MainInteractor: MainInteractorInputProtocol {
                     if let city = createCity(citySearch, country) {
                         try context.save()
                         fetchCountrys()
+                        presenter?.updateTableView()
                         DispatchQueue.main.async {
                             self.requestWeaher(forCity: city)
                         }
@@ -197,7 +201,7 @@ extension MainInteractor: MainInteractorInputProtocol {
 
                     try context.save()
                     fetchCountrys()
-                    
+                    presenter?.updateTableView()
                     DispatchQueue.main.async {
                         self.requestWeaher(forCity: city)
                     }

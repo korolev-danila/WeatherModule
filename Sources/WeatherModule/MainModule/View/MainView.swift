@@ -19,7 +19,7 @@ protocol MainViewOutputProtocol {
     
     func didTapButton()
     func showDetails(index: IndexPath)
-    func deleteCity(for index: IndexPath)
+    func deleteCity(for index: IndexPath) -> Int
     func deleteAll()
     
     func countrysCount() -> Int
@@ -66,6 +66,8 @@ public class MainViewController: UIViewController {
         
         return tv
     }()
+    
+    
     
     // MARK: - Initialize Method
     init(presenter: MainViewOutputProtocol) {
@@ -139,15 +141,6 @@ public class MainViewController: UIViewController {
         leftButton.tintColor = .blue
         self.navigationItem.setLeftBarButton(leftButton, animated: true)
         self.navigationItem.setRightBarButton(nil, animated: true)
-        
-//        let editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editButtonTap))
-//        editButton.tintColor = .systemBlue
-//        editButton.customView?.backgroundColor = .systemGray
-//        editButton.customView?.clipsToBounds = true
-//        editButton.customView?.layer.cornerRadius = 8
-//
-//        self.navigationController?.navigationBar.topItem?.setLeftBarButton(editButton, animated: true)
-//        self.navigationItem.setRightBarButton(nil, animated: true)
     }
     
     @objc func editButtonTap() {
@@ -170,17 +163,26 @@ public class MainViewController: UIViewController {
     }
     
     @objc func deleteButtonTap() {
-        showAlertButtonTapped()
-    }
-    
-    func showAlertButtonTapped() {
         
         let alert = UIAlertController(title: "Attention", message: "Do you want to delete all cities?",
                                       preferredStyle: UIAlertController.Style.alert)
         alert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler: { [weak self] _ in
             self?.setEditButton()
             self?.deleteIsHidden = true
+        //    let count = self?.presenter.countrysCount()
             self?.presenter.deleteAll()
+            self?.reloadTableView()
+//            if count != nil {
+//                if count! > 0 {
+//                    var sectionArr: [Int] = []
+//                    for dig in 1...count! {
+//                        sectionArr.append(dig)
+//                    }
+//                    print(sectionArr)
+//                    let indexSet = IndexSet(sectionArr)
+//                    self?.tableView.deleteSections(indexSet, with: .right)
+//                }
+//            }
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: { [weak self] _ in
             self?.setEditButton()
@@ -264,7 +266,14 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
 extension MainViewController: MainViewCellDelegate {
     func delete(cell: MainCell) {
         if let indexPath = tableView.indexPath(for: cell) {
-            presenter.deleteCity(for: indexPath)
+            let countOfCitys = presenter.deleteCity(for: indexPath)
+            
+            if countOfCitys == 1 {
+                let indexSet = IndexSet(arrayLiteral: indexPath.section)
+                tableView.deleteSections(indexSet, with: .right)
+            } else {
+                tableView.deleteRows(at: [indexPath], with: .right)
+            }
         }
     }
 }

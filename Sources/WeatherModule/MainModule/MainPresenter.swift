@@ -28,11 +28,7 @@ class MainPresenter {
     private let router: MainRouterProtocol
     private let interactor: MainInteractorInputProtocol
     
-    private var countrys: [Country] = [] {
-        didSet {
-            view?.reloadTableView()
-        }
-    }
+    private var countrys: [Country] = []
     
     var timer: Timer?
  //   var firstLaunch = true
@@ -93,11 +89,18 @@ extension MainPresenter: MainViewOutputProtocol {
     }
     
     func showDetails(index: IndexPath) {
-        router.pushDetailsView(city: countrys[index.section].citysArray[index.row])
+        if let city = countrys[safe: index.section]?.citysArray[safe: index.row] {
+            router.pushDetailsView(city: city)
+        }
     }
     
-    func deleteCity(for index: IndexPath) {
-        interactor.deleteCity(countrys[index.section].citysArray[index.row])
+    func deleteCity(for index: IndexPath) -> Int {
+        let count = countrys[safe: index.section]?.citysArray.count
+        if let city = countrys[safe: index.section]?.citysArray[safe: index.row] {
+            interactor.deleteCity(city)
+        }
+        
+        return count ?? 0
     }
     
     func deleteAll() {
@@ -113,7 +116,8 @@ extension MainPresenter: MainViewOutputProtocol {
     }
     
     func sectionArrayCount(_ section: Int) -> Int {
-        return countrys[section].citysArray.count
+        
+        return countrys[safe: section]?.citysArray.count ?? 0
     }
     
     func createHeaderViewModel(_ section: Int) -> HeaderCellViewModel {
@@ -166,6 +170,9 @@ extension MainPresenter: MainViewOutputProtocol {
 
 // MARK: - MainInteractorOutputProtocol
 extension MainPresenter: MainInteractorOutputProtocol {
+    func updateTableView() {
+        view?.reloadTableView()
+    }
     
     func updateCountrysArray(_ array: [Country]) {
         self.countrys = array
