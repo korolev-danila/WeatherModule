@@ -33,10 +33,9 @@ protocol DetailsViewOutputProtocol {
 }
 
 
-public class DetailsViewController: UIViewController {
+final public class DetailsViewController: UIViewController {
     
     private let presenter: DetailsViewOutputProtocol
-    
     
     private let barButton: UIButton = {
         let button = UIButton()
@@ -116,6 +115,7 @@ public class DetailsViewController: UIViewController {
         return tv
     }()
     
+    private var hasAnimatedAllCells = false
     
     
     // MARK: - initialize & viewDidLoad
@@ -134,6 +134,10 @@ public class DetailsViewController: UIViewController {
         
         initialize()
         presenter.viewDidLoad()
+    }
+    
+    deinit {
+        print("deinit DetailsViewController")
     }
     
     private func initialize() {
@@ -187,7 +191,7 @@ public class DetailsViewController: UIViewController {
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.top.equalToSuperview()
-            make.height.equalTo(172) // UIScreen.main.bounds.height / 5.5
+            make.height.equalTo(172)
         }
         
         cityView.initialize()
@@ -304,7 +308,7 @@ extension DetailsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 148
+        return 80
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -323,5 +327,31 @@ extension DetailsViewController: UITableViewDelegate, UITableViewDataSource {
         cell.configureCell(presenter.createNewsViewModel(index: indexPath))
         
         return cell
+    }
+    
+    public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        
+        guard !hasAnimatedAllCells else {
+            return
+        }
+        
+        
+        let duration = 0.5
+        let delayFactor = 0.05
+        cell.transform = CGAffineTransform(translationX: 0, y: 30) // rowHeight / 2
+        cell.alpha = 0
+        
+        UIView.animate(
+            withDuration: duration,
+            delay: delayFactor * Double(indexPath.row),
+            options: [.curveEaseInOut],
+            animations: {
+                cell.transform = CGAffineTransform(translationX: 0, y: 0)
+                cell.alpha = 1
+            })
+        
+        hasAnimatedAllCells = tableView.isLastVisibleCell(at: indexPath)
+        
+
     }
 }

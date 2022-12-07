@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import WebKit
 
-class CollectionCell: UICollectionViewCell {
+final class CollectionCell: UICollectionViewCell {
     
     private let webView: WKWebView = {
         let preferences = WKPreferences()
@@ -266,6 +266,9 @@ class CollectionCell: UICollectionViewCell {
         dayOfTheWeekLabel.text = viewModel.week
         
         if viewModel.svgStr != "" {
+            self.iconActivityView.isHidden = false
+            self.iconActivityView.startAnimating()
+            self.webView.isHidden = true
             vcWebDelegate.setDelegate()
             webView.loadHTMLString(viewModel.svgStr, baseURL: nil)
         }
@@ -273,7 +276,7 @@ class CollectionCell: UICollectionViewCell {
 }
 
 // MARK: - VCWebDelegate
-class VCWebDelegate: UIViewController {
+final class VCWebDelegate: UIViewController {
     
     weak var iconActivityView: UIActivityIndicatorView?
     weak var webView: WKWebView?
@@ -284,6 +287,9 @@ class VCWebDelegate: UIViewController {
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    deinit {
+        print("deinit VCWebDelegate")
     }
     
     func setDelegate() {
@@ -298,17 +304,12 @@ class VCWebDelegate: UIViewController {
 // MARK: - WKNavigationDelegate
 extension VCWebDelegate: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        self.iconActivityView?.isHidden = false
-        self.iconActivityView?.startAnimating()
+       
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.webView?.isHidden = false
         self.iconActivityView?.stopAnimating()
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-//
-//        }
     }
-    
 }
 

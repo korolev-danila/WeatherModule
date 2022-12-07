@@ -26,7 +26,7 @@ protocol SearchViewOutputProtocol {
     
 }
 
-public class SearchViewController: UIViewController {
+final public class SearchViewController: UIViewController {
     
     let presenter: SearchViewOutputProtocol
     

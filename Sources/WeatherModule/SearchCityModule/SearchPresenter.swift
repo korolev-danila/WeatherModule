@@ -13,7 +13,7 @@ struct SearchViewModel {
 }
 
 
-class SearchPresenter {
+final class SearchPresenter {
     
     weak var view: SearchViewInputProtocol?
     let interactor: SearchInteractorInputProtocol

@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import SnapKit
 
-class NewsCell: UITableViewCell {
+final class NewsCell: UITableViewCell {
     
     private let dateLabel: UILabel = {
         let label = UILabel()
@@ -29,7 +29,7 @@ class NewsCell: UITableViewCell {
         let label = UILabel()
         label.text = "Inside the investigation into who killed 4 college students in Moscow, Idaho"
         label.font = UIFont.systemFont(ofSize: 20)
-        label.numberOfLines = 2
+        label.numberOfLines = 3
         label.minimumScaleFactor = 0.2
         label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .left
@@ -63,7 +63,7 @@ class NewsCell: UITableViewCell {
         
         self.addSubview(dateLabel)
         self.addSubview(titleLabel)
-        self.addSubview(descriptionTextView)
+       // self.addSubview(descriptionTextView)
         
         dateLabel.snp.makeConstraints { make in
             make.leading.equalTo(8)
@@ -76,15 +76,15 @@ class NewsCell: UITableViewCell {
             make.leading.equalTo(dateLabel.snp.trailing).offset(4)
             make.trailing.equalTo(-16)
             make.top.equalTo(2)
-            make.height.equalTo(44)
-        }
-        
-        descriptionTextView.snp.makeConstraints { make in
-            make.leading.equalTo(8)
-            make.trailing.equalTo(-8)
-            make.top.equalTo(titleLabel.snp.bottom)
             make.bottom.equalTo(0)
         }
+        
+//        descriptionTextView.snp.makeConstraints { make in
+//            make.leading.equalTo(8)
+//            make.trailing.equalTo(-8)
+//            make.top.equalTo(titleLabel.snp.bottom)
+//            make.bottom.equalTo(0)
+//        }
     }
     
     
@@ -92,22 +92,7 @@ class NewsCell: UITableViewCell {
         
         dateLabel.text = viewModel.date
         titleLabel.text = viewModel.title
-        descriptionTextView.text = viewModel.description.htmlToString
+     //   descriptionTextView.text = viewModel.description.htmlToString
         
-    }
-}
-
-// MARK: - htmlToAttributedString
-extension String {
-    var htmlToAttributedString: NSAttributedString? {
-        guard let data = data(using: .utf8) else { return nil }
-        do {
-            return try NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding:String.Encoding.utf8.rawValue], documentAttributes: nil)
-        } catch {
-            return nil
-        }
-    }
-    var htmlToString: String {
-        return htmlToAttributedString?.string ?? ""
     }
 }

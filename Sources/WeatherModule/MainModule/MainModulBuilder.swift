@@ -7,7 +7,7 @@
 import UIKit
 
 
-public class MainModulBuider {
+final public class MainModulBuider {
     public static func build() -> UINavigationController {
         let interactor = MainInteractor()
         let router = MainRouter()

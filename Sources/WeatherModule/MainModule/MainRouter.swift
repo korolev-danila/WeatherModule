@@ -14,7 +14,7 @@ protocol MainRouterProtocol: AnyObject {
     func pushDetailsView(city: City)
 }
 
-class MainRouter: MainRouterProtocol {
+final class MainRouter: MainRouterProtocol {
     weak var navigationController: UINavigationController?
     
     func pushSearchView(delegate: MainPresenterDelegate) {
@@ -23,8 +23,8 @@ class MainRouter: MainRouterProtocol {
     }
     
     func pushDetailsView(city: City) {
-        if navigationController != nil {
-            let vc = DetailsModulBuider.build(nc: navigationController!, city: city)
+        if let nc = navigationController {
+            let vc = DetailsModulBuider.build(nc: nc, city: city)
             print("push Details")
             navigationController?.pushViewController(vc, animated: true)
         }

@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import SnapKit
 
-class CitySubView: UIView {
+final class CitySubView: UIView {
     
     private let nameCityLabel: UILabel = {
         let label = UILabel()
@@ -588,13 +588,19 @@ class CitySubView: UIView {
     public func configureWeatherView(_ model: FactViewModel) {
         
         seasonLabel.text = model.season
+        dayTempLabel.fadeTransition(0.5)
         dayTempLabel.text = model.dayTemp
+        nightTempLabel.fadeTransition(0.5)
         nightTempLabel.text = model.nightTemp
+        conditionLabel.fadeTransition(0.5)
         conditionLabel.text = model.condition
+        windSpeedLabel.fadeTransition(0.5)
         windSpeedLabel.text =  model.windSpeed
+        humidityLabel.fadeTransition(0.5)
         humidityLabel.text = model.humidity
+        windDirLabel.fadeTransition(0.5)
         windDirLabel.text = model.windDir
+        pressureMmLabel.fadeTransition(0.5)
         pressureMmLabel.text = model.pressureMm
     }
-    
 }

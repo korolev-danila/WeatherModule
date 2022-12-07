@@ -31,7 +31,6 @@ class MainPresenter {
     private var countrys: [Country] = []
     
     var timer: Timer?
- //   var firstLaunch = true
     
     init(interactor: MainInteractorInputProtocol, router: MainRouterProtocol){
         self.interactor = interactor
@@ -184,13 +183,5 @@ extension MainPresenter: MainPresenterDelegate {
     
     func save(_ citySearch: CitySearch) {
         interactor.save(citySearch)
-    }
-}
-
-// MARK: - Collection safe index
-extension Collection {
-    /// Returns the element at the specified index if it is within bounds, otherwise nil.
-    subscript (safe index: Index) -> Element? {
-        return indices.contains(index) ? self[index] : nil
     }
 }

@@ -24,7 +24,7 @@ protocol MainInteractorOutputProtocol: AnyObject {
     func updateTableView()
 }
 
-class MainInteractor {
+final class MainInteractor {
     weak var presenter: MainInteractorOutputProtocol?
     
     var countrys: [Country] = []

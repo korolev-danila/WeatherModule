@@ -7,7 +7,7 @@
 
 import Foundation
 
-class SearchModulBuider {
+final class SearchModulBuider {
     static func build(delegate: MainPresenterDelegate) -> SearchViewController {
         let interctor = SearchInteractor()
         let presenter = SearchPresenter(interactor: interctor, delegate: delegate)

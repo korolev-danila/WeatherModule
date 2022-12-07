@@ -18,9 +18,13 @@ protocol DetailsInteractorOutputProtocol: AnyObject {
     func updateNews(_ news: News)
 }
 
-class DetailsInteractor {
+final class DetailsInteractor {
     
     weak var presenter: DetailsInteractorOutputProtocol?
+    
+    deinit {
+        print("deinit DetailsInteractor")
+    }
     
     private func  fetchIcons(weather: Weather) {
         

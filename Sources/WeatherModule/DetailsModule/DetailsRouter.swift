@@ -13,11 +13,15 @@ protocol DetailsRouterProtocol: AnyObject {
     func popVC()
 }
 
-class DetailsRouter: DetailsRouterProtocol {
+final class DetailsRouter: DetailsRouterProtocol {
     weak var navigationController: UINavigationController?
     
     init(nc: UINavigationController) {
         self.navigationController = nc
+    }
+    
+    deinit {
+        print("deinit DetailsRouterProtocol")
     }
     
     func popVC() {

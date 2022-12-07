@@ -8,7 +8,10 @@
 import Foundation
 import UIKit
 
-public class DetailsModulBuider {
+final public class DetailsModulBuider {
+    deinit {
+        print("deinit DetailsModulBuider")
+    }
     public static func build(nc: UINavigationController, city: City) -> DetailsViewController {
         let interctor = DetailsInteractor()
         let router = DetailsRouter(nc: nc)

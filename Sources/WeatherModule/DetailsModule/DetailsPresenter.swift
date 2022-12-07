@@ -40,7 +40,7 @@ struct NewsViewModel {
 }
 
 
-class DetailsPresenter {
+final class DetailsPresenter {
     
     private let interactor: DetailsInteractorInputProtocol
     private let router: DetailsRouterProtocol
@@ -67,18 +67,25 @@ class DetailsPresenter {
         self.city = city
         
     }
+    
+    deinit {
+        print("deinit DetailsPresenter")
+    }
 }
     
     // MARK: - DetailsViewOutputProtocol
 extension DetailsPresenter: DetailsViewOutputProtocol {
     
     func viewDidLoad() {
+        DispatchQueue.main.async {
+            self.interactor.requestWeaher(forCity: self.city)
+        }
         
-        interactor.requestWeaher(forCity: city)
         view?.configureCityView()
-//        DispatchQueue.main.async {
-//            self.interactor.getNewsForCity(self.city.name)
-//        }
+        
+        DispatchQueue.main.async {
+            self.interactor.getNewsForCity(self.city.name)
+        }
     }
     
     func popVC() {
@@ -254,6 +261,8 @@ extension DetailsPresenter: DetailsInteractorOutputProtocol {
     
     func updateNews(_ news: News) {
         self.news = news
+        print("Update News")
+        print(news.articles?.count)
     }
 }
 

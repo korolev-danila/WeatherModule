@@ -17,7 +17,7 @@ protocol SearchInteractorOutputProtocol: AnyObject {
     func showCitys(_ citys: [CitySearch])
 }
 
-class SearchInteractor {
+final class SearchInteractor {
     
     weak var presenter: SearchInteractorOutputProtocol?
 }

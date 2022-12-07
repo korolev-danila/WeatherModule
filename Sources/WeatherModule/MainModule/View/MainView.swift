@@ -30,7 +30,7 @@ protocol MainViewOutputProtocol {
     func updateFlag(forSection section: Int)
 }
 
-public class MainViewController: UIViewController {
+final public class MainViewController: UIViewController {
     
     let presenter: MainViewOutputProtocol
     
@@ -66,6 +66,8 @@ public class MainViewController: UIViewController {
         
         return tv
     }()
+    
+    private var hasAnimatedAllCells = false
     
     
     
@@ -169,7 +171,7 @@ public class MainViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler: { [weak self] _ in
             self?.setEditButton()
             self?.deleteIsHidden = true
-        //    let count = self?.presenter.countrysCount()
+        //   let count = self?.presenter.countrysCount()
             self?.presenter.deleteAll()
             self?.reloadTableView()
 //            if count != nil {
@@ -204,6 +206,8 @@ public class MainViewController: UIViewController {
     }
 }
 
+
+
 // MARK: - MainViewInputProtocol
 extension MainViewController: MainViewInputProtocol {
     
@@ -211,6 +215,8 @@ extension MainViewController: MainViewInputProtocol {
         tableView.reloadData()
     }
 }
+
+
 
 // MARK: - UITableViewDelegate UITableViewDataSource
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
@@ -260,7 +266,27 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 30
     }
+    
+    public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        
+        guard !hasAnimatedAllCells else {
+            return
+        }
+
+        cell.alpha = 0
+
+        UIView.animate(
+            withDuration: 0.5,
+            delay: 0.05 * Double(indexPath.row),
+            animations: {
+                cell.alpha = 1
+        })
+
+        hasAnimatedAllCells = tableView.isLastVisibleCell(at: indexPath)
+    }
 }
+
+
 
 // MARK: - MainViewCellDelegate
 extension MainViewController: MainViewCellDelegate {
@@ -270,35 +296,11 @@ extension MainViewController: MainViewCellDelegate {
             
             if countOfCitys == 1 {
                 let indexSet = IndexSet(arrayLiteral: indexPath.section)
+                print(indexSet)
                 tableView.deleteSections(indexSet, with: .right)
             } else {
                 tableView.deleteRows(at: [indexPath], with: .right)
             }
         }
-    }
-}
-
-// MARK: - UIImage resize
-extension UIImage {
-    /// change the image size by pixels
-    func resize(_ max_size: CGFloat) -> UIImage {
-        let max_size_pixels = max_size / UIScreen.main.scale
-        let aspectRatio =  size.width/size.height
-        var width: CGFloat
-        var height: CGFloat
-        var newImage: UIImage
-        if aspectRatio > 1 {
-            width = max_size_pixels
-            height = max_size_pixels / aspectRatio
-        } else {
-            height = max_size_pixels
-            width = max_size_pixels * aspectRatio
-        }
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: width, height: height), format: UIGraphicsImageRendererFormat.default())
-        newImage = renderer.image {
-            (context) in
-            self.draw(in: CGRect(x: 0, y: 0, width: width, height: height))
-        }
-        return newImage
     }
 }
