@@ -173,7 +173,9 @@ class MainCell: UITableViewCell {
             }
         } else {
             activityView.stopAnimating()
+            tempLabel.fadeTransition(0.2)
             tempLabel.text = viewModel.temp
+            timeLabel.fadeTransition(0.2)
             timeLabel.text = viewModel.time
             timeLabel.isHidden = false
             tempLabel.isHidden = false

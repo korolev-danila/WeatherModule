@@ -76,7 +76,7 @@ extension TimeAndTemp: Identifiable {
 }
 
 // MARK: - Persistent Container
-var persistentContainer: NSPersistentContainer = {
+private var persistentContainer: NSPersistentContainer = {
     let container = NSPersistentCloudKitContainer(name: "ExampleModel", managedObjectModel: managedObjectModel())
     
     container.loadPersistentStores(completionHandler: { (storeDescription, error) in
@@ -87,12 +87,12 @@ var persistentContainer: NSPersistentContainer = {
     return container
 }()
 
-var context: NSManagedObjectContext = {
+public var context: NSManagedObjectContext = {
     return persistentContainer.viewContext
 }()
 
 
-func managedObjectModel() -> NSManagedObjectModel {
+private func managedObjectModel() -> NSManagedObjectModel {
     
     let model = NSManagedObjectModel()
     

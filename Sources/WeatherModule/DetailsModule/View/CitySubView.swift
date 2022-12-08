@@ -353,6 +353,16 @@ final class CitySubView: UIView {
         return label
     }()
     
+    override init( frame: CGRect) {
+        super.init(frame: frame)
+        
+        initialize()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public func initialize() {
         
       //  self.addSubview(view)

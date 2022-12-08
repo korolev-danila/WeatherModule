@@ -33,9 +33,10 @@ protocol DetailsViewOutputProtocol {
 }
 
 
-final public class DetailsViewController: UIViewController {
+final class DetailsViewController: UIViewController {
     
     private let presenter: DetailsViewOutputProtocol
+    
     
     private let barButton: UIButton = {
         let button = UIButton()
@@ -61,6 +62,7 @@ final public class DetailsViewController: UIViewController {
         iView.backgroundColor = .clear
         iView.contentMode = .scaleToFill
         iView.translatesAutoresizingMaskIntoConstraints = false
+        iView.isHidden = true
         
         return iView
     }()
@@ -70,11 +72,12 @@ final public class DetailsViewController: UIViewController {
         view.backgroundColor = .lightGray
         view.layer.cornerRadius = 15
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.isHidden = true
         
         return view
     }()
     
-    private let cityView: CitySubView = {
+    private var cityView: CitySubView = {
         let view = CitySubView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 12
@@ -85,8 +88,7 @@ final public class DetailsViewController: UIViewController {
         
         return view
     }()
-    
-    
+        
     
     private let collectionView: UICollectionView = {
         
@@ -117,6 +119,8 @@ final public class DetailsViewController: UIViewController {
     
     private var hasAnimatedAllCells = false
     
+    private let shimmerView = ShimmerView()
+    
     
     // MARK: - initialize & viewDidLoad
     init(presenter: DetailsViewOutputProtocol) {
@@ -132,13 +136,31 @@ final public class DetailsViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        
         initialize()
-        presenter.viewDidLoad()
+        
+      //  presenter.viewDidLoad()
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        shimmerView.startShimmerEffect()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            self.imageView.isHidden = false
+            self.bigView.isHidden = false
+            self.shimmerView.isHidden = true
+            self.shimmerView.stopShimmerEffect()
+        }
     }
     
     deinit {
         print("deinit DetailsViewController")
     }
+
+    
     
     private func initialize() {
         view.backgroundColor = .white
@@ -158,12 +180,18 @@ final public class DetailsViewController: UIViewController {
         view.addSubview(blurEffectView)
         view.addSubview(imageView)
         view.addSubview(bigView)
+        view.addSubview(shimmerView)
         
         bigView.addSubview(cityView)
         bigView.addSubview(collectionView)
         bigView.addSubview(newsTableView)
         
-        
+        shimmerView.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+        }
         
         blurEffectView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
@@ -194,8 +222,7 @@ final public class DetailsViewController: UIViewController {
             make.height.equalTo(172)
         }
         
-        cityView.initialize()
-        
+
         
         collectionView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
@@ -204,6 +231,7 @@ final public class DetailsViewController: UIViewController {
             make.height.equalTo(108)
         }
         
+      
         
         newsTableView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
@@ -211,6 +239,7 @@ final public class DetailsViewController: UIViewController {
             make.bottom.equalToSuperview()
             make.top.equalTo(collectionView.snp.bottom).offset(2)
         }
+        
     }
     
     // MARK: - Action popVC
