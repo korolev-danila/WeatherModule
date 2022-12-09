@@ -7,6 +7,7 @@
 
 import Foundation
 import Alamofire
+import CoreData
 
 protocol DetailsInteractorInputProtocol {
     func requestWeaher(forCity city: City)
@@ -21,6 +22,12 @@ protocol DetailsInteractorOutputProtocol: AnyObject {
 final class DetailsInteractor {
     
     weak var presenter: DetailsInteractorOutputProtocol?
+    private let context: NSManagedObjectContext
+
+    
+    init(coreData: CoreDataProtocol){
+        self.context = coreData.persistentContainer.viewContext
+    }
     
     deinit {
         print("deinit DetailsInteractor")

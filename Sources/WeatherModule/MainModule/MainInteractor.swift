@@ -26,8 +26,13 @@ protocol MainInteractorOutputProtocol: AnyObject {
 
 final class MainInteractor {
     weak var presenter: MainInteractorOutputProtocol?
+    private let context: NSManagedObjectContext
     
     var countrys: [Country] = []
+    
+    init(coreData: CoreDataProtocol){
+        self.context = coreData.persistentContainer.viewContext
+    }
     
     private func updateImg(image: Data, in country: Country) {
 

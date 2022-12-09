@@ -8,6 +8,10 @@
 import Foundation
 import CoreData
 
+protocol CoreDataProtocol: class {
+    var persistentContainer: NSPersistentContainer { get set }
+}
+
 public final class Country: NSManagedObject {
     @NSManaged var name: String
     @NSManaged var isoA2: String
@@ -33,13 +37,13 @@ extension Country: Identifiable {
     
     @objc(addCitysObject:)
     @NSManaged public func addToCitys(_ value: City)
-
+    
     @objc(removeCitysObject:)
     @NSManaged public func removeFromCitys(_ value: City)
-
+    
     @objc(addCitys:)
     @NSManaged public func addToCitys(_ values: NSSet)
-
+    
     @objc(removeCitys:)
     @NSManaged public func removeFromCitys(_ values: NSSet)
 }
@@ -50,7 +54,7 @@ public final class City: NSManagedObject {
     @NSManaged var latitude: Double
     @NSManaged var longitude: Double
     @NSManaged var population: Double
-
+    
     @NSManaged var country: Country
     @NSManaged var timeAndTemp: TimeAndTemp
 }
@@ -75,150 +79,151 @@ extension TimeAndTemp: Identifiable {
     }
 }
 
-// MARK: - Persistent Container
-private var persistentContainer: NSPersistentContainer = {
-    let container = NSPersistentCloudKitContainer(name: "ExampleModel", managedObjectModel: managedObjectModel())
-    
-    container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-        if let error = error as NSError? {
-            fatalError("Unresolved error \(error), \(error.userInfo)")
-        }
-    })
-    return container
-}()
-
-public var context: NSManagedObjectContext = {
-    return persistentContainer.viewContext
-}()
 
 
-private func managedObjectModel() -> NSManagedObjectModel {
-    
-    let model = NSManagedObjectModel()
-    
-    
-    
-    // MARK: - CountryEntity
-    
-    let countryEnt = NSEntityDescription()
-    countryEnt.name = "Country"
-    countryEnt.managedObjectClassName = NSStringFromClass(Country.self)
-    
-    // Attributes
-    
-    let countryNameAttr = NSAttributeDescription()
-    countryNameAttr.name = "name"
-    countryNameAttr.attributeType = .stringAttributeType
-    
-    let countryIsoA2Attr = NSAttributeDescription()
-    countryIsoA2Attr.name = "isoA2"
-    countryIsoA2Attr.attributeType = .stringAttributeType
-    
-    let countryFlagDataAttr = NSAttributeDescription()
-    countryFlagDataAttr.name = "flagData"
-    countryFlagDataAttr.attributeType = .binaryDataAttributeType
-    countryFlagDataAttr.isOptional = true
+
+final class CoreDataManager: CoreDataProtocol {
+    // MARK: - Persistent Container
+    var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentCloudKitContainer(name: "ExampleModel", managedObjectModel: managedObjectModel())
+        
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        return container
+    }()
     
     
-    
-    // MARK: - CityEntity
-    
-    let cityEnt = NSEntityDescription()
-    cityEnt.name = "City"
-    cityEnt.managedObjectClassName = NSStringFromClass(City.self)
-    
-    // Attributes
-    
-    let nameAttr = NSAttributeDescription()
-    nameAttr.name = "name"
-    nameAttr.attributeType = .stringAttributeType
-    
-    let isCapitalAttr = NSAttributeDescription()
-    isCapitalAttr.name = "isCapital"
-    isCapitalAttr.attributeType = .booleanAttributeType
-    
-    let latitudeAttr = NSAttributeDescription()
-    latitudeAttr.name = "latitude"
-    latitudeAttr.attributeType = .doubleAttributeType
-    
-    let longitudeAttr = NSAttributeDescription()
-    longitudeAttr.name = "longitude"
-    longitudeAttr.attributeType = .doubleAttributeType
-    
-    let populationAttr = NSAttributeDescription()
-    populationAttr.name = "population"
-    populationAttr.attributeType = .doubleAttributeType
-    
-    
-    
-    // MARK: - TimeAndTempEntity
-    
-    let timeAndTempEnt = NSEntityDescription()
-    timeAndTempEnt.name = "TimeAndTemp"
-    timeAndTempEnt.managedObjectClassName = NSStringFromClass(TimeAndTemp.self)
-    
-    // Attributes
-    
-    let tempAttr = NSAttributeDescription()
-    tempAttr.name = "temp"
-    tempAttr.attributeType = .doubleAttributeType
-    
-    let utcDiffAttr = NSAttributeDescription()
-    utcDiffAttr.name = "utcDiff"
-    utcDiffAttr.attributeType = .doubleAttributeType
-    
-    let isNilAttr = NSAttributeDescription()
-    isNilAttr.name = "isNil"
-    isNilAttr.attributeType = .booleanAttributeType
-    
-    
-    // MARK: - Relationships
-    
-    let countryToCity = NSRelationshipDescription()
-    countryToCity.name = "citys"
-    countryToCity.destinationEntity = cityEnt
-    countryToCity.deleteRule = .cascadeDeleteRule
-    
-    let cityToCountry = NSRelationshipDescription()
-    cityToCountry.name = "country"
-    cityToCountry.destinationEntity = countryEnt
-    cityToCountry.maxCount = 1
-    cityToCountry.deleteRule = .nullifyDeleteRule
-    
-    let cityToTime = NSRelationshipDescription()
-    cityToTime.name = "timeAndTemp"
-    cityToTime.destinationEntity = timeAndTempEnt
-    cityToTime.maxCount = 1
-    cityToTime.deleteRule = .cascadeDeleteRule
-    
-    let timeToCity = NSRelationshipDescription()
-    timeToCity.name = "city"
-    timeToCity.destinationEntity = cityEnt
-    timeToCity.maxCount = 1
-    timeToCity.deleteRule = .nullifyDeleteRule
-    
-    // Inverse relationships
-    countryToCity.inverseRelationship = cityToCountry
-    cityToCountry.inverseRelationship = countryToCity
-    
-    cityToTime.inverseRelationship = timeToCity
-    timeToCity.inverseRelationship = cityToTime
-    
-    
-    
-    // Set properties
-    countryEnt.properties = [countryNameAttr, countryIsoA2Attr, countryFlagDataAttr, countryToCity]
-    cityEnt.properties = [nameAttr,
-                          isCapitalAttr,
-                          latitudeAttr,
-                          longitudeAttr,
-                          populationAttr,
-                          cityToCountry,
-                          cityToTime]
-    timeAndTempEnt.properties = [tempAttr, utcDiffAttr, isNilAttr, timeToCity]
-    
-    
-    model.entities = [countryEnt, cityEnt, timeAndTempEnt]
-    
-    return model
+    private static func managedObjectModel() -> NSManagedObjectModel {
+        
+        let model = NSManagedObjectModel()
+        
+        
+        
+        // MARK: - CountryEntity
+        
+        let countryEnt = NSEntityDescription()
+        countryEnt.name = "Country"
+        countryEnt.managedObjectClassName = NSStringFromClass(Country.self)
+        
+        // Attributes
+        
+        let countryNameAttr = NSAttributeDescription()
+        countryNameAttr.name = "name"
+        countryNameAttr.attributeType = .stringAttributeType
+        
+        let countryIsoA2Attr = NSAttributeDescription()
+        countryIsoA2Attr.name = "isoA2"
+        countryIsoA2Attr.attributeType = .stringAttributeType
+        
+        let countryFlagDataAttr = NSAttributeDescription()
+        countryFlagDataAttr.name = "flagData"
+        countryFlagDataAttr.attributeType = .binaryDataAttributeType
+        countryFlagDataAttr.isOptional = true
+        
+        
+        
+        // MARK: - CityEntity
+        
+        let cityEnt = NSEntityDescription()
+        cityEnt.name = "City"
+        cityEnt.managedObjectClassName = NSStringFromClass(City.self)
+        
+        // Attributes
+        
+        let nameAttr = NSAttributeDescription()
+        nameAttr.name = "name"
+        nameAttr.attributeType = .stringAttributeType
+        
+        let isCapitalAttr = NSAttributeDescription()
+        isCapitalAttr.name = "isCapital"
+        isCapitalAttr.attributeType = .booleanAttributeType
+        
+        let latitudeAttr = NSAttributeDescription()
+        latitudeAttr.name = "latitude"
+        latitudeAttr.attributeType = .doubleAttributeType
+        
+        let longitudeAttr = NSAttributeDescription()
+        longitudeAttr.name = "longitude"
+        longitudeAttr.attributeType = .doubleAttributeType
+        
+        let populationAttr = NSAttributeDescription()
+        populationAttr.name = "population"
+        populationAttr.attributeType = .doubleAttributeType
+        
+        
+        
+        // MARK: - TimeAndTempEntity
+        
+        let timeAndTempEnt = NSEntityDescription()
+        timeAndTempEnt.name = "TimeAndTemp"
+        timeAndTempEnt.managedObjectClassName = NSStringFromClass(TimeAndTemp.self)
+        
+        // Attributes
+        
+        let tempAttr = NSAttributeDescription()
+        tempAttr.name = "temp"
+        tempAttr.attributeType = .doubleAttributeType
+        
+        let utcDiffAttr = NSAttributeDescription()
+        utcDiffAttr.name = "utcDiff"
+        utcDiffAttr.attributeType = .doubleAttributeType
+        
+        let isNilAttr = NSAttributeDescription()
+        isNilAttr.name = "isNil"
+        isNilAttr.attributeType = .booleanAttributeType
+        
+        
+        // MARK: - Relationships
+        
+        let countryToCity = NSRelationshipDescription()
+        countryToCity.name = "citys"
+        countryToCity.destinationEntity = cityEnt
+        countryToCity.deleteRule = .cascadeDeleteRule
+        
+        let cityToCountry = NSRelationshipDescription()
+        cityToCountry.name = "country"
+        cityToCountry.destinationEntity = countryEnt
+        cityToCountry.maxCount = 1
+        cityToCountry.deleteRule = .nullifyDeleteRule
+        
+        let cityToTime = NSRelationshipDescription()
+        cityToTime.name = "timeAndTemp"
+        cityToTime.destinationEntity = timeAndTempEnt
+        cityToTime.maxCount = 1
+        cityToTime.deleteRule = .cascadeDeleteRule
+        
+        let timeToCity = NSRelationshipDescription()
+        timeToCity.name = "city"
+        timeToCity.destinationEntity = cityEnt
+        timeToCity.maxCount = 1
+        timeToCity.deleteRule = .nullifyDeleteRule
+        
+        // Inverse relationships
+        countryToCity.inverseRelationship = cityToCountry
+        cityToCountry.inverseRelationship = countryToCity
+        
+        cityToTime.inverseRelationship = timeToCity
+        timeToCity.inverseRelationship = cityToTime
+        
+        
+        
+        // Set properties
+        countryEnt.properties = [countryNameAttr, countryIsoA2Attr, countryFlagDataAttr, countryToCity]
+        cityEnt.properties = [nameAttr,
+                              isCapitalAttr,
+                              latitudeAttr,
+                              longitudeAttr,
+                              populationAttr,
+                              cityToCountry,
+                              cityToTime]
+        timeAndTempEnt.properties = [tempAttr, utcDiffAttr, isNilAttr, timeToCity]
+        
+        
+        model.entities = [countryEnt, cityEnt, timeAndTempEnt]
+        
+        return model
+    }
 }

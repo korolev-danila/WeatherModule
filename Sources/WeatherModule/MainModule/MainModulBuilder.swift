@@ -9,8 +9,9 @@ import UIKit
 
 final public class MainModulBuider {
     public static func build() -> UINavigationController {
-        let interactor = MainInteractor()
-        let router = MainRouter()
+        let CDManager = CoreDataManager()
+        let interactor = MainInteractor(coreData: CDManager)
+        let router = MainRouter(coreData: CDManager)
         let presenter = MainPresenter(interactor: interactor, router: router)
         let viewController = MainViewController(presenter: presenter)
         let navigationController = UINavigationController(rootViewController: viewController)
