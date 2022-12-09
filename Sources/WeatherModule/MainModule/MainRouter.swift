@@ -16,7 +16,7 @@ protocol MainRouterProtocol: AnyObject {
 
 
 
-final class MainRouter: MainRouterProtocol {
+final class MainRouter {
     weak var navigationController: UINavigationController?
     private let coreDataManager: CoreDataProtocol
     
@@ -24,6 +24,12 @@ final class MainRouter: MainRouterProtocol {
         self.coreDataManager = coreData
     }
     
+}
+
+
+
+// MARK: - MainRouterProtocol
+extension MainRouter: MainRouterProtocol{
     
     public func pushSearchView(delegate: MainPresenterDelegate) {
         let vc =  SearchModulBuider.build(delegate: delegate)

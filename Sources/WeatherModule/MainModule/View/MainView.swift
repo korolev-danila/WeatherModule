@@ -244,6 +244,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
                                                        width: tableView.frame.width,
                                                        height: 60))
         let viewModel = presenter.createHeaderViewModel(section)
+        
         if UIImage(data: viewModel.imgData) == nil { presenter.updateFlag(forSection: section)}
         
         headerView.settingCell(viewModel)
