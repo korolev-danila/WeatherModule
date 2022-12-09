@@ -17,14 +17,22 @@ protocol SearchInteractorOutputProtocol: AnyObject {
     func showCitys(_ citys: [CitySearch])
 }
 
+
 final class SearchInteractor {
     
     weak var presenter: SearchInteractorOutputProtocol?
+    
+    deinit {
+        print("deinit SearchInteractor")
+    }
 }
 
+
+
+// MARK: - SearchInteractorInputProtocol
 extension SearchInteractor: SearchInteractorInputProtocol {
     
-    func getCitysArray(forName string: String) {
+    public func getCitysArray(forName string: String) {
         var citys: [CitySearch] = []
         
         let headers: HTTPHeaders = [

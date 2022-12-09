@@ -23,6 +23,7 @@ final class CollectionCell: UICollectionViewCell {
         wv.contentMode = .center
         wv.isOpaque = false
         wv.isHidden = true
+        wv.isUserInteractionEnabled = false
         wv.backgroundColor = .clear
         
         return wv

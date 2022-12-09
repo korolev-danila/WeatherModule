@@ -26,11 +26,11 @@ protocol SearchViewOutputProtocol {
     
 }
 
-final public class SearchViewController: UIViewController {
+final class SearchViewController: UIViewController {
     
-    let presenter: SearchViewOutputProtocol
+    private let presenter: SearchViewOutputProtocol
     
-    var search: String = ""
+    private var search: String = ""
     
     private let activityView: UIActivityIndicatorView = {
         
@@ -69,6 +69,8 @@ final public class SearchViewController: UIViewController {
         return tv
     }()
     
+    
+    
     // MARK: - Initialize & viewDidLoad
     init(presenter: SearchViewOutputProtocol) {
         self.presenter = presenter
@@ -77,6 +79,10 @@ final public class SearchViewController: UIViewController {
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print("deinit SearchViewController")
     }
     
     public override func viewDidLoad() {
@@ -120,21 +126,23 @@ final public class SearchViewController: UIViewController {
 }
 
 
+
 // MARK: - SearchViewInputProtocol
 extension SearchViewController: SearchViewInputProtocol {
     
-    func reloadTableView() {
+    public func reloadTableView() {
         tableView.reloadData()
     }
     
-    func startAnimation() {
+    public func startAnimation() {
         activityView.startAnimating()
     }
     
-    func stopAnimation() {
+    public func stopAnimation() {
         activityView.stopAnimating()
     }
 }
+
 
 
 // MARK: - TextField Delegate
@@ -164,6 +172,7 @@ extension SearchViewController: UITextFieldDelegate {
         return true
     }
 }
+
 
 
 // MARK: - TableViewController Delegate

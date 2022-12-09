@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class HeaderView: UIView {
+final class HeaderView: UIView {
     
     private let headerLabel: UILabel = {
         let label = UILabel()
@@ -86,6 +86,8 @@ class HeaderView: UIView {
                                    height: heightOfCell  / 2)
     }
     
+    
+    // MARK: - Public method
     public func settingCell(_ viewModel: HeaderCellViewModel) {
         
         headerLabel.text = viewModel.name

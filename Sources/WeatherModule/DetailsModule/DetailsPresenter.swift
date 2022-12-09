@@ -73,10 +73,12 @@ final class DetailsPresenter {
     }
 }
     
+
+
     // MARK: - DetailsViewOutputProtocol
 extension DetailsPresenter: DetailsViewOutputProtocol {
     
-    func viewDidLoad() {
+    public func viewDidLoad() {
         DispatchQueue.main.async {
             self.interactor.requestWeaher(forCity: self.city)
         }
@@ -88,11 +90,11 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
         }
     }
     
-    func popVC() {
+    public func popVC() {
         router.popVC()
     }
     
-    func createCityViewModel() -> CityViewModel {
+    public func createCityViewModel() -> CityViewModel {
         var population = ""
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -106,7 +108,7 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
                              populationOfCity: population)
     }
     
-    func createFactViewModel() -> FactViewModel {
+    public func createFactViewModel() -> FactViewModel {
         
         var dayTemp = ""
         var nightTemp = ""
@@ -154,7 +156,7 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
     
     
     
-    func changeSelectCellIndex(_ index: IndexPath?) -> IndexPath {
+    public func changeSelectCellIndex(_ index: IndexPath?) -> IndexPath {
         let oldInd = selectCellIndex
         if index != nil {
             selectCellIndex = index!
@@ -162,7 +164,7 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
         return oldInd
     }
     
-    func forecastCount() -> Int {
+    public func forecastCount() -> Int {
         if let count = weather?.forecasts?.count {
             return count
         }
@@ -171,7 +173,7 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
     
     
     
-    func forecastViewModel(heightOfCell: Double, index: IndexPath) -> ForecastViewModel {
+    public func forecastViewModel(heightOfCell: Double, index: IndexPath) -> ForecastViewModel {
         var dayTemp = ""
         var nightTemp = ""
         var date = ""
@@ -198,6 +200,7 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
                     week = String(weekOld.prefix(3))
                 }
             }
+            
             if let svg = day.svgStr {
                 let svgOld = String(svg.dropFirst(84))
                 let svgNew = """
@@ -211,7 +214,7 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
                                  date: date, week: week, svgStr: svgStr)
     }
 
-    func newsCount() -> Int {
+    public func newsCount() -> Int {
         if let count = news?.articles?.count {
             return count
         }
@@ -219,7 +222,7 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
     }
      
     
-    func createNewsViewModel(index: IndexPath) -> NewsViewModel {
+    public func createNewsViewModel(index: IndexPath) -> NewsViewModel {
         
         var title = ""
         var description = ""
@@ -246,23 +249,24 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
         return NewsViewModel(title: title, description: description, date: date)
     }
     
-    func printItem(_ index: IndexPath) {
-        print(news?.articles?[index.row])
+    public func printItem(_ index: IndexPath) {
+        print(news?.articles?[safe: index.row] ?? "nil")
     }
 }
+
+
 
 // MARK: - DetailsInteractorOutputProtocol
 extension DetailsPresenter: DetailsInteractorOutputProtocol {
     
-    func updateViewWeather(_ weather: Weather) {
+    public func updateViewWeather(_ weather: Weather) {
         self.weather = weather
         view?.configureWeatherView(indexCell: selectCellIndex)
+        view?.stopShimmer()
     }
     
-    func updateNews(_ news: News) {
+    public func updateNews(_ news: News) {
         self.news = news
-        print("Update News")
-        print(news.articles?.count)
     }
 }
 

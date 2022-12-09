@@ -24,7 +24,7 @@ final class DetailsRouter: DetailsRouterProtocol {
         print("deinit DetailsRouterProtocol")
     }
     
-    func popVC() {
+    public func popVC() {
         self.navigationController?.popViewController(animated: true)
     }    
 }

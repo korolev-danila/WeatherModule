@@ -71,7 +71,7 @@ final class DetailsInteractor {
                 completion(index,str)
                 
             case .failure(let error):
-                print(error)
+                print(error.localizedDescription)
             }
         }
     }
@@ -94,10 +94,13 @@ final class DetailsInteractor {
     }
 }
 
+
+
+// MARK: - DetailsInteractorInputProtocol
 extension DetailsInteractor: DetailsInteractorInputProtocol {
     
-    // MARK: - Api request layer
-    func requestWeaher(forCity city: City) {
+    // MARK: Api request layer
+    public func requestWeaher(forCity city: City) {
         
         let headers: HTTPHeaders = [
             "X-Yandex-API-Key": "80e1e833-ed8f-483b-9870-957eeb4e86a5"
@@ -126,12 +129,12 @@ extension DetailsInteractor: DetailsInteractorInputProtocol {
                 }
   
             case .failure(let error):
-                print(error)
+                print(error.localizedDescription)
             }
         }
     }
     
-    func getNewsForCity(_ cityName: String) {
+    public func getNewsForCity(_ cityName: String) {
 
         let name = cityName.replacingOccurrences(of: " ", with: "+")
         

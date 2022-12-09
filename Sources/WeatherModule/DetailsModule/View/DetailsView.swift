@@ -15,6 +15,7 @@ protocol DetailsViewInputProtocol: AnyObject {
     func configureWeatherView(indexCell: IndexPath)
     func reloadCollection()
     func reloadTableView()
+    func stopShimmer()
 }
 
 protocol DetailsViewOutputProtocol {
@@ -137,23 +138,14 @@ final class DetailsViewController: UIViewController {
         super.viewDidLoad()
         
         
-        
         initialize()
-        
-      //  presenter.viewDidLoad()
+        presenter.viewDidLoad()
     }
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         shimmerView.startShimmerEffect()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-            self.imageView.isHidden = false
-            self.bigView.isHidden = false
-            self.shimmerView.isHidden = true
-            self.shimmerView.stopShimmerEffect()
-        }
     }
     
     deinit {
@@ -169,7 +161,7 @@ final class DetailsViewController: UIViewController {
         let leftBarButton = UIBarButtonItem(customView: barButton)
         self.navigationItem.leftBarButtonItem = leftBarButton
         
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        
         
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -177,7 +169,7 @@ final class DetailsViewController: UIViewController {
         newsTableView.delegate = self
         newsTableView.dataSource = self
         
-        view.addSubview(blurEffectView)
+        
         view.addSubview(imageView)
         view.addSubview(bigView)
         view.addSubview(shimmerView)
@@ -191,13 +183,6 @@ final class DetailsViewController: UIViewController {
             make.bottom.equalToSuperview()
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
-        }
-        
-        blurEffectView.snp.makeConstraints { make in
-            make.leading.equalToSuperview()
-            make.trailing.equalToSuperview()
-            make.top.equalToSuperview()
-            make.height.equalTo(44)
         }
         
         imageView.snp.makeConstraints { make in
@@ -243,7 +228,7 @@ final class DetailsViewController: UIViewController {
     }
     
     // MARK: - Action popVC
-    @objc func backButtonTapped() {
+    @objc private func backButtonTapped() {
         presenter.popVC()
     }
 }
@@ -253,7 +238,7 @@ final class DetailsViewController: UIViewController {
 // MARK: - DetailsViewInputProtocol
 extension DetailsViewController: DetailsViewInputProtocol {
     
-    func configureCityView() {
+    public func configureCityView() {
         let model = presenter.createCityViewModel()
         
         if let data = model.countryFlag {
@@ -264,7 +249,7 @@ extension DetailsViewController: DetailsViewInputProtocol {
         cityView.configureCityView(model)
     }
     
-    func configureWeatherView(indexCell: IndexPath) {
+    public func configureWeatherView(indexCell: IndexPath) {
         let oldIndex = presenter.changeSelectCellIndex(indexCell)
         let model = presenter.createFactViewModel()
         
@@ -277,12 +262,32 @@ extension DetailsViewController: DetailsViewInputProtocol {
         cityView.configureWeatherView(model)
     }
     
-    func reloadCollection() {
+    public func reloadCollection() {
         collectionView.reloadData()
     }
     
-    func reloadTableView() {
+    public func reloadTableView() {
         newsTableView.reloadData()
+    }
+    
+    public func stopShimmer() {
+        
+        let blurEffectView = UIVisualEffectView(effect: self.blurEffect)
+        self.view.addSubview(blurEffectView)
+        blurEffectView.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.top.equalToSuperview()
+            make.height.equalTo(44)
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.imageView.isHidden = false
+            self.bigView.isHidden = false
+            self.shimmerView.isHidden = true
+            self.shimmerView.stopShimmerEffect()
+            
+        }
     }
 }
 
@@ -367,7 +372,7 @@ extension DetailsViewController: UITableViewDelegate, UITableViewDataSource {
         
         let duration = 0.5
         let delayFactor = 0.05
-        cell.transform = CGAffineTransform(translationX: 0, y: 30) // rowHeight / 2
+        cell.transform = CGAffineTransform(translationX: 0, y: 30)
         cell.alpha = 0
         
         UIView.animate(
@@ -380,7 +385,5 @@ extension DetailsViewController: UITableViewDelegate, UITableViewDataSource {
             })
         
         hasAnimatedAllCells = tableView.isLastVisibleCell(at: indexPath)
-        
-
     }
 }

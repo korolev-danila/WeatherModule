@@ -12,7 +12,8 @@ protocol MainViewCellDelegate: AnyObject {
     func delete(cell: MainCell)
 }
 
-class MainCell: UITableViewCell {
+
+final class MainCell: UITableViewCell {
     
     weak var delegate: MainViewCellDelegate?
     
@@ -28,7 +29,7 @@ class MainCell: UITableViewCell {
         label.text = "Name label"
         label.font = UIFont.systemFont(ofSize: 20)
         label.adjustsFontSizeToFitWidth = true
-        label.numberOfLines = 2
+        label.numberOfLines = 1
         label.minimumScaleFactor = 0.2
         label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .left
@@ -42,7 +43,7 @@ class MainCell: UITableViewCell {
         label.text = "10:00"
         label.font = UIFont.systemFont(ofSize: 20)
         label.adjustsFontSizeToFitWidth = true
-        label.numberOfLines = 3
+        label.numberOfLines = 1
         label.minimumScaleFactor = 0.02
         label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .right
@@ -56,7 +57,7 @@ class MainCell: UITableViewCell {
         label.text = "0"
         label.font = UIFont.systemFont(ofSize: 20)
         label.adjustsFontSizeToFitWidth = true
-        label.numberOfLines = 3
+        label.numberOfLines = 1
         label.minimumScaleFactor = 0.02
         label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .right
@@ -97,6 +98,9 @@ class MainCell: UITableViewCell {
         return button
     }()
     
+    
+    
+    // MARK: - Init
     override init( style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init( style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
@@ -163,6 +167,7 @@ class MainCell: UITableViewCell {
     }
     
     
+    // MARK: - configureCell
     public func configureCell(_ viewModel: MainCellViewModel, deleteIsHidden: Bool) {
         if viewModel.temp == nil {
             if !activityView.isAnimating {
@@ -173,9 +178,7 @@ class MainCell: UITableViewCell {
             }
         } else {
             activityView.stopAnimating()
-            tempLabel.fadeTransition(0.2)
             tempLabel.text = viewModel.temp
-            timeLabel.fadeTransition(0.2)
             timeLabel.text = viewModel.time
             timeLabel.isHidden = false
             tempLabel.isHidden = false

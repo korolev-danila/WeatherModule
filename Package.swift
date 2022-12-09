@@ -29,6 +29,8 @@ let package = Package(
             dependencies: ["Alamofire","SnapKit"]),
         .testTarget(
             name: "WeatherModuleTests",
-            dependencies: ["WeatherModule"]),
+            dependencies: ["WeatherModule"],
+            path: "Tests"
+        )
     ]
 )

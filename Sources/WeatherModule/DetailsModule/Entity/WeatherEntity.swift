@@ -33,6 +33,8 @@ struct Weather: Decodable {
     }
 }
 
+
+
 struct Info: Decodable {
     
     var lat: Double?
@@ -62,6 +64,8 @@ struct Info: Decodable {
     }
 }
 
+
+
 struct Tzinfo: Decodable {
     
     var offset: Double?
@@ -81,6 +85,8 @@ struct Tzinfo: Decodable {
         self.dst = try? container.decode(Bool.self, forKey: .dst)
     }
 }
+
+
 
 struct Fact: Decodable {
     var temp: Double?
@@ -179,6 +185,8 @@ struct Forecasts: Decodable {
     }
 }
 
+
+
 struct Parts: Decodable {
     var dayShort: DayShort?
     var nightShort: NightShort?
@@ -194,6 +202,8 @@ struct Parts: Decodable {
         self.nightShort = try? container.decode(NightShort.self, forKey: .nightShort)
     }
 }
+
+
 
 struct DayShort: Decodable {
     var temp: Double?
@@ -236,6 +246,8 @@ struct DayShort: Decodable {
         self.cloudness = try? container.decode(Double.self, forKey: .cloudness)
     }
 }
+
+
 
 struct NightShort: Decodable {
     var temp: Double?

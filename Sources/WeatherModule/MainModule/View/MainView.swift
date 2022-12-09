@@ -30,7 +30,7 @@ protocol MainViewOutputProtocol {
     func updateFlag(forSection section: Int)
 }
 
-final public class MainViewController: UIViewController {
+final class MainViewController: UIViewController {
     
     let presenter: MainViewOutputProtocol
     
@@ -125,13 +125,13 @@ final public class MainViewController: UIViewController {
     
     
     // MARK: - NavigationBar UI&Method
-    func settingNC() {
+    private func settingNC() {
         self.navigationController?.navigationBar.topItem?.title = "Weather of Citys"
         self.navigationController?.navigationBar.prefersLargeTitles = true
         setEditButton()
     }
     
-    func setEditButton() {
+    private func setEditButton() {
         
         let editBarButton = UIButton(frame: CGRect(x: 0, y: 0, width: 44, height: 30))
         editBarButton.setTitle("edit", for: .normal)
@@ -145,7 +145,7 @@ final public class MainViewController: UIViewController {
         self.navigationItem.setRightBarButton(nil, animated: true)
     }
     
-    @objc func editButtonTap() {
+    @objc private func editButtonTap() {
         
         print("setEdit")
         deleteIsHidden = false
@@ -164,27 +164,15 @@ final public class MainViewController: UIViewController {
         self.navigationItem.setRightBarButton(deleteButton, animated: true)
     }
     
-    @objc func deleteButtonTap() {
+    @objc private func deleteButtonTap() {
         
         let alert = UIAlertController(title: "Attention", message: "Do you want to delete all cities?",
                                       preferredStyle: UIAlertController.Style.alert)
         alert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler: { [weak self] _ in
             self?.setEditButton()
             self?.deleteIsHidden = true
-        //   let count = self?.presenter.countrysCount()
             self?.presenter.deleteAll()
             self?.reloadTableView()
-//            if count != nil {
-//                if count! > 0 {
-//                    var sectionArr: [Int] = []
-//                    for dig in 1...count! {
-//                        sectionArr.append(dig)
-//                    }
-//                    print(sectionArr)
-//                    let indexSet = IndexSet(sectionArr)
-//                    self?.tableView.deleteSections(indexSet, with: .right)
-//                }
-//            }
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: { [weak self] _ in
             self?.setEditButton()
@@ -195,13 +183,13 @@ final public class MainViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    @objc func doneButtonTap() {
+    @objc private func doneButtonTap() {
         setEditButton()
         deleteIsHidden = true
         tableView.reloadData()
     }
     
-    @objc func addTapButton() {
+    @objc private func addTapButton() {
         presenter.didTapButton()
     }
 }
@@ -211,7 +199,7 @@ final public class MainViewController: UIViewController {
 // MARK: - MainViewInputProtocol
 extension MainViewController: MainViewInputProtocol {
     
-    func reloadTableView() {
+    public func reloadTableView() {
         tableView.reloadData()
     }
 }
@@ -290,7 +278,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
 
 // MARK: - MainViewCellDelegate
 extension MainViewController: MainViewCellDelegate {
-    func delete(cell: MainCell) {
+    public func delete(cell: MainCell) {
         if let indexPath = tableView.indexPath(for: cell) {
             let countOfCitys = presenter.deleteCity(for: indexPath)
             

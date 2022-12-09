@@ -8,7 +8,7 @@
 import Foundation
 import CoreData
 
-protocol CoreDataProtocol: class {
+protocol CoreDataProtocol: AnyObject {
     var persistentContainer: NSPersistentContainer { get set }
 }
 
@@ -81,10 +81,10 @@ extension TimeAndTemp: Identifiable {
 
 
 
-
+// MARK: - CoreDataProtocol
 final class CoreDataManager: CoreDataProtocol {
-    // MARK: - Persistent Container
-    var persistentContainer: NSPersistentContainer = {
+   
+    public var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentCloudKitContainer(name: "ExampleModel", managedObjectModel: managedObjectModel())
         
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in

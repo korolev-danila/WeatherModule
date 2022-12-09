@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 
 
-class SearchCell: UITableViewCell {
+final class SearchCell: UITableViewCell {
     
     private let nameLabel: UILabel = {
         let label = UILabel()
@@ -41,6 +41,8 @@ class SearchCell: UITableViewCell {
         return label
     }()
     
+    
+    
     // MARK: - init
     override init( style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init( style: style, reuseIdentifier: reuseIdentifier)
@@ -51,7 +53,7 @@ class SearchCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setupViews() {
+    private func setupViews() {
         self.backgroundColor = .clear
         self.selectionStyle = .none
         
@@ -72,8 +74,10 @@ class SearchCell: UITableViewCell {
         }
     }
     
+    
+    
     // MARK: - configureCell
-    func configureCell(_ viewModel: SearchViewModel) {
+    public func configureCell(_ viewModel: SearchViewModel) {
         nameLabel.text = viewModel.name
         countryLabel.text = viewModel.country
     }

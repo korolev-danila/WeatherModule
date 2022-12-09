@@ -24,11 +24,13 @@ protocol MainInteractorOutputProtocol: AnyObject {
     func updateTableView()
 }
 
+
+
 final class MainInteractor {
     weak var presenter: MainInteractorOutputProtocol?
     private let context: NSManagedObjectContext
     
-    var countrys: [Country] = []
+    private var countrys: [Country] = []
     
     init(coreData: CoreDataProtocol){
         self.context = coreData.persistentContainer.viewContext
@@ -71,7 +73,7 @@ final class MainInteractor {
 extension MainInteractor: MainInteractorInputProtocol {
     
     //  CoreData layer
-    func fetchCountrys() {
+    public func fetchCountrys() {
         
         let fetchRequest: NSFetchRequest<Country> = Country.fetchRequest()
         
@@ -84,7 +86,7 @@ extension MainInteractor: MainInteractorInputProtocol {
         }
     }
     
-    func resetAllRecords() {
+    public func resetAllRecords() {
         
         let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Country")
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
@@ -97,7 +99,7 @@ extension MainInteractor: MainInteractorInputProtocol {
         }
     }
     
-    func deleteCity(_ city: City) {
+    public func deleteCity(_ city: City) {
         
         if city.country.citysArray.count == 1 {
             context.delete(city.country)
@@ -114,7 +116,7 @@ extension MainInteractor: MainInteractorInputProtocol {
     }
     
     // для отладки работы отношений
-    func searchCountCityAndTempEntity() {
+    public func searchCountCityAndTempEntity() {
         
         let fetchRequest: NSFetchRequest<City> = City.fetchRequest()
         let fetchRequest2: NSFetchRequest<TimeAndTemp> = TimeAndTemp.fetchRequest()
@@ -131,7 +133,9 @@ extension MainInteractor: MainInteractorInputProtocol {
     }
     
     
-    func save(_ citySearch: CitySearch) {
+    
+    // MARK: - Save method
+    public func save(_ citySearch: CitySearch) {
         
         func createCity(_ citySearch: CitySearch,_ country: Country) -> City? {
             guard let cityEntity = NSEntityDescription.entity(forEntityName: "City", in: context) else { return nil}
@@ -221,7 +225,7 @@ extension MainInteractor: MainInteractorInputProtocol {
     
     
     // MARK: - Request
-    func requestFlagImg(country: Country) {
+    public func requestFlagImg(country: Country) {
 
         let iso = country.isoA2.lowercased()
       ///  let url = "https://countryflagsapi.com/png/\(country.isoA2)"
@@ -235,12 +239,12 @@ extension MainInteractor: MainInteractorInputProtocol {
                 self.updateImg(image: data, in: country)
                 
             case .failure(let error):
-                print(error)
+                print(error.localizedDescription)
             }
         }
     }
     
-    func requestWeaher(forCity city: City) {
+    public func requestWeaher(forCity city: City) {
         
         let headers: HTTPHeaders = [
             "X-Yandex-API-Key": "80e1e833-ed8f-483b-9870-957eeb4e86a5"
@@ -266,7 +270,7 @@ extension MainInteractor: MainInteractorInputProtocol {
                 self.updateWeather(with: parsedResult, in: city)
                 
             case .failure(let error):
-                print(error)
+                print(error.localizedDescription)
             }
         }
     }

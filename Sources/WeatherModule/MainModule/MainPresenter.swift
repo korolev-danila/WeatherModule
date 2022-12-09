@@ -22,7 +22,7 @@ protocol MainPresenterDelegate: AnyObject  {
     func save(_ citySearch: CitySearch)
 }
 
-class MainPresenter {
+final class MainPresenter {
     
     weak var view: MainViewInputProtocol?
     private let router: MainRouterProtocol
@@ -30,7 +30,7 @@ class MainPresenter {
     
     private var countrys: [Country] = []
     
-    var timer: Timer?
+    private var timer: Timer?
     
     init(interactor: MainInteractorInputProtocol, router: MainRouterProtocol){
         self.interactor = interactor
@@ -54,7 +54,7 @@ class MainPresenter {
         print("updateTime")
     }
     
-    @objc func reloadTable() {
+    @objc private func reloadTable() {
         view?.reloadTableView()
     }
     
@@ -74,7 +74,7 @@ class MainPresenter {
 // MARK: - MainViewOutputProtocol
 extension MainPresenter: MainViewOutputProtocol {
     
-    func viewDidLoad() {
+    public func viewDidLoad() {
         interactor.fetchCountrys()
         startTimer()
         updateAllTemp()
@@ -83,17 +83,17 @@ extension MainPresenter: MainViewOutputProtocol {
 
     
     // MARK: - Actions
-    func didTapButton() {
+    public func didTapButton() {
         router.pushSearchView(delegate: self)
     }
     
-    func showDetails(index: IndexPath) {
+    public func showDetails(index: IndexPath) {
         if let city = countrys[safe: index.section]?.citysArray[safe: index.row] {
             router.pushDetailsView(city: city)
         }
     }
     
-    func deleteCity(for index: IndexPath) -> Int {
+    public func deleteCity(for index: IndexPath) -> Int {
         let count = countrys[safe: index.section]?.citysArray.count
         if let city = countrys[safe: index.section]?.citysArray[safe: index.row] {
             interactor.deleteCity(city)
@@ -102,7 +102,7 @@ extension MainPresenter: MainViewOutputProtocol {
         return count ?? 0
     }
     
-    func deleteAll() {
+    public func deleteAll() {
         countrys = []
         interactor.resetAllRecords()
     }
@@ -110,16 +110,16 @@ extension MainPresenter: MainViewOutputProtocol {
 
     
     // MARK: - UI Update
-    func countrysCount() -> Int {
+    public func countrysCount() -> Int {
         return countrys.count
     }
     
-    func sectionArrayCount(_ section: Int) -> Int {
+    public func sectionArrayCount(_ section: Int) -> Int {
         
         return countrys[safe: section]?.citysArray.count ?? 0
     }
     
-    func createHeaderViewModel(_ section: Int) -> HeaderCellViewModel {
+    public func createHeaderViewModel(_ section: Int) -> HeaderCellViewModel {
         
         var data = Data()
         
@@ -137,7 +137,7 @@ extension MainPresenter: MainViewOutputProtocol {
                                    imgData: data)
     }
     
-    func createCellViewModel(for index: IndexPath) -> MainCellViewModel {
+    public func createCellViewModel(for index: IndexPath) -> MainCellViewModel {
 
         let name = countrys[safe: index.section]?.citysArray[safe: index.row]?.name ?? ""
         
@@ -158,7 +158,7 @@ extension MainPresenter: MainViewOutputProtocol {
         return  MainCellViewModel(name: name, temp: temp, time: timeString)
     }
     
-    func updateFlag(forSection section: Int) {
+    public func updateFlag(forSection section: Int) {
         if let country = countrys[safe: section] {
             DispatchQueue.main.async {
                 self.interactor.requestFlagImg(country: country)
@@ -167,21 +167,25 @@ extension MainPresenter: MainViewOutputProtocol {
     }
 }
 
+
+
 // MARK: - MainInteractorOutputProtocol
 extension MainPresenter: MainInteractorOutputProtocol {
-    func updateTableView() {
+    public func updateTableView() {
         view?.reloadTableView()
     }
     
-    func updateCountrysArray(_ array: [Country]) {
+    public func updateCountrysArray(_ array: [Country]) {
         self.countrys = array
     }
 }
 
+
+
 // MARK: - MainPresenterDelegate
 extension MainPresenter: MainPresenterDelegate {
     
-    func save(_ citySearch: CitySearch) {
+    public func save(_ citySearch: CitySearch) {
         interactor.save(citySearch)
     }
 }
