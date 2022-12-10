@@ -52,7 +52,7 @@ final class CitySubView: UIView {
     
     private let populationTextCityLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .white
+        label.backgroundColor = .clear
         label.font = UIFont.systemFont(ofSize: 17)
         label.adjustsFontSizeToFitWidth = true
         label.numberOfLines = 1
@@ -66,11 +66,11 @@ final class CitySubView: UIView {
     
     private let populationCityLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .white
+        label.backgroundColor = .clear
         label.font = UIFont.systemFont(ofSize: 17)
         label.adjustsFontSizeToFitWidth = true
         label.numberOfLines = 1
-        label.minimumScaleFactor = 0.02
+        label.minimumScaleFactor = 0.2
         label.textAlignment  = .left
         label.text = "999999999"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -80,8 +80,12 @@ final class CitySubView: UIView {
     
     private let seasonTextLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .white
+        label.backgroundColor = .clear
         label.textAlignment  = .right
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.2
+        label.baselineAdjustment = .alignBaselines
         label.text = "Season:"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -90,7 +94,7 @@ final class CitySubView: UIView {
     
     private let seasonLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .white
+        label.backgroundColor = .clear
         label.font = UIFont.systemFont(ofSize: 17)
         label.textAlignment  = .left
         label.text = "summer"
@@ -226,6 +230,10 @@ final class CitySubView: UIView {
         label.backgroundColor = .clear
         label.textColor = .gray
         label.textAlignment  = .left
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.1
+        label.baselineAdjustment = .alignBaselines
         label.text = "Condition:"
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -265,6 +273,10 @@ final class CitySubView: UIView {
         label.backgroundColor = .clear
         label.textColor = .gray
         label.font = UIFont.systemFont(ofSize: 15)
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.1
+        label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .right
         label.text = "Wind speed:"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -471,17 +483,17 @@ final class CitySubView: UIView {
             make.top.equalToSuperview()
             make.height.equalTo(17)
             make.leading.equalTo(conditionLabel.snp.leading).offset(4)
-            make.trailing.equalTo(tempView.snp.centerX).offset(40)
+            make.trailing.equalTo(tempView.snp.centerX).offset(38)
         }
         dayTempLabel.snp.makeConstraints { make in
             make.centerY.equalTo(dayTextLabel.snp.centerY)
             make.height.equalTo(19)
-            make.leading.equalTo(dayTextLabel.snp.trailing).offset(2)
+            make.leading.equalTo(dayTextLabel.snp.trailing) //.offset(2)
             make.width.equalTo(26)
         }
         dayCLabel.snp.makeConstraints { make in
             make.top.equalTo(dayTextLabel.snp.top)
-            make.height.equalTo(14)
+            make.height.equalTo(12)
             make.leading.equalTo(dayTempLabel.snp.trailing)
         }
         
@@ -499,7 +511,7 @@ final class CitySubView: UIView {
         }
         nightCLabel.snp.makeConstraints { make in
             make.top.equalTo(nightTextLabel.snp.top)
-            make.height.equalTo(14)
+            make.height.equalTo(12)
             make.leading.equalTo(nightTempLabel.snp.trailing)
         }
      

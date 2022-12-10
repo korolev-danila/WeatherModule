@@ -64,6 +64,7 @@ final class SearchViewController: UIViewController {
         let tv = UITableView()
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.register(SearchCell.self, forCellReuseIdentifier: "cell")
+        tv.backgroundColor = .clear
         tv.keyboardDismissMode = .onDrag
         
         return tv

@@ -85,7 +85,7 @@ final class MainViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        initialize()
+        setupViews()
         settingNC()
         presenter.viewDidLoad()
     }
@@ -97,7 +97,7 @@ final class MainViewController: UIViewController {
     }
 
      
-    private func initialize() {
+    private func setupViews() {
         
         view.backgroundColor = .white
         

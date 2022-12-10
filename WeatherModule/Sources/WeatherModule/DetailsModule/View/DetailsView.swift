@@ -278,7 +278,7 @@ extension DetailsViewController: DetailsViewInputProtocol {
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.top.equalToSuperview()
-            make.height.equalTo(44)
+            make.height.equalTo(34)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
