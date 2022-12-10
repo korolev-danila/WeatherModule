@@ -100,6 +100,8 @@ final class ShimmerView: UIView {
     
     private let newsLayer = CAGradientLayer()
     
+    
+    // MARK: - Init
     override init( frame: CGRect) {
         super.init(frame: frame)
         

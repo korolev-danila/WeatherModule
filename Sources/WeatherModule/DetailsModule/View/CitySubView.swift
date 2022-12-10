@@ -356,17 +356,15 @@ final class CitySubView: UIView {
     override init( frame: CGRect) {
         super.init(frame: frame)
         
-        initialize()
+        setupViews()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func initialize() {
-        
-      //  self.addSubview(view)
-        
+    public func setupViews() {
+                
         self.addSubview(nameCityLabel)
         self.addSubview(isCapitalImageView)
 

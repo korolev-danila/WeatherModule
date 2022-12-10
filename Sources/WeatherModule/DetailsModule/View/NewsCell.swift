@@ -39,15 +39,15 @@ final class NewsCell: UITableViewCell {
         return label
     }()
     
-    private let descriptionTextView: UITextView = {
-        let textView = UITextView()
-        textView.text = "Nine days since the killings of four college students attending the University of Idaho, police have not arrested any suspect, but are \"definitely making progress,\" according to an outside public information officer."
-        textView.font = UIFont.systemFont(ofSize: 15)
-        textView.textColor = .systemGray
-        textView.translatesAutoresizingMaskIntoConstraints = false
-        
-        return textView
-    }()
+//    private let descriptionTextView: UITextView = {
+//        let textView = UITextView()
+//        textView.text = "Nine days since the killings of four college students attending the University of Idaho, police have not arrested any suspect, but are \"definitely making progress,\" according to an outside public information officer."
+//        textView.font = UIFont.systemFont(ofSize: 15)
+//        textView.textColor = .systemGray
+//        textView.translatesAutoresizingMaskIntoConstraints = false
+//
+//        return textView
+//    }()
     
     // MARK: - Init
     override init( style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

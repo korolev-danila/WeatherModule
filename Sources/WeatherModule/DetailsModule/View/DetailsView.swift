@@ -138,7 +138,7 @@ final class DetailsViewController: UIViewController {
         super.viewDidLoad()
         
         
-        initialize()
+        setupViews()
         presenter.viewDidLoad()
     }
     
@@ -154,7 +154,7 @@ final class DetailsViewController: UIViewController {
 
     
     
-    private func initialize() {
+    private func setupViews() {
         view.backgroundColor = .white
         
         barButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)

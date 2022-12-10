@@ -228,7 +228,6 @@ extension MainInteractor: MainInteractorInputProtocol {
     public func requestFlagImg(country: Country) {
 
         let iso = country.isoA2.lowercased()
-      ///  let url = "https://countryflagsapi.com/png/\(country.isoA2)"
         
         guard let url = URL(string: "https://flagcdn.com/w640/\(iso).jpg") else { return }
         

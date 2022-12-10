@@ -276,6 +276,8 @@ final class CollectionCell: UICollectionViewCell {
     }
 }
 
+
+
 // MARK: - VCWebDelegate
 final class VCWebDelegate: UIViewController {
     
@@ -293,7 +295,7 @@ final class VCWebDelegate: UIViewController {
         print("deinit VCWebDelegate")
     }
     
-    func setDelegate() {
+    public func setDelegate() {
         if webView != nil {
             webView?.navigationDelegate = self
         } else {
@@ -301,6 +303,8 @@ final class VCWebDelegate: UIViewController {
         }
     }
 }
+
+
 
 // MARK: - WKNavigationDelegate
 extension VCWebDelegate: WKNavigationDelegate {

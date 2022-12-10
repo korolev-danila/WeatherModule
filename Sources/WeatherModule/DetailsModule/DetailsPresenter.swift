@@ -249,6 +249,7 @@ extension DetailsPresenter: DetailsViewOutputProtocol {
         return NewsViewModel(title: title, description: description, date: date)
     }
     
+    /// when u tap at newsCell
     public func printItem(_ index: IndexPath) {
         print(news?.articles?[safe: index.row] ?? "nil")
     }

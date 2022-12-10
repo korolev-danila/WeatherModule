@@ -88,11 +88,11 @@ final class SearchViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        initialize()
+        setupViews()
         textField.becomeFirstResponder()
     }
     
-    private func initialize() {
+    private func setupViews() {
         
         view.backgroundColor = .white
         

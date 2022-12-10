@@ -144,7 +144,7 @@ extension MainPresenter: MainViewOutputProtocol {
         var temp: String? = nil
         var timeString: String = ""
         if let bool = countrys[safe: index.section]?.citysArray[safe: index.row]?.timeAndTemp.isNil {
-            
+            /// checking whether the temperature of the new city has been updated
             if !bool {
                 let time = Date() + (countrys[safe: index.section]?.citysArray[safe: index.row]?.timeAndTemp.utcDiff ?? 0.0)
                 let formatter = DateFormatter()
